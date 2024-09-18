@@ -104,7 +104,7 @@ for Mn = Mns
     toc
     % gchp_regrid_so2 ./ N to get to cosampled mean
     N(N==0) = nan;
-    so2_sim = so2_out ./ N;
+    so2_sim = so2_sim_out ./ N;
     so2_tro = so2_tro_out./N;
     bg_gchp = mean(bg_gchp_out, 2, 'omitnan');
     bg_tro  = mean(bg_tro_out, 2, 'omitnan');
@@ -114,7 +114,7 @@ for Mn = Mns
     savenc(sfname, so2_sim, so2_tro, bg_gchp, bg_tro, tlat, tlon)
     fprintf('%s saved\n',sfname)
     
-    clear so2_out
+    clear so2_*
 end
 %}
 
