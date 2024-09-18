@@ -70,8 +70,8 @@ for Mn = Mns
             sim_so2 = sim_so2 .* mask;
 
             % find background signal over the Pacific
-            bg_gchp = mean(sim_so2(pmask == 1), 2, 'omitnan'); % take the average along longitude
-            bg_tro = mean(tro_so2(pmask == 1), 2, 'omitnan');
+            bg_gchp = mean(sim_so2.*pmask, 2, 'omitnan'); % take the average along longitude
+            bg_tro  = mean(tro_so2.*pmask, 2, 'omitnan');
             noise = bg_tro - bg_gchp;
             tro_so2 = tro_so2 - noise; % would it lead to negative values?
 
