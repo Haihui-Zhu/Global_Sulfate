@@ -44,7 +44,7 @@ def make_plot(awm_data,Ylabel,emission_labels,regions):
 ###### SO2 emission inventories ####
 data_label  = ['TROPOMI 2018', 'GCHP-CEDS 2018', 'GCHP-HTAP 2018','GCHP-EDGAR 2018'] # options: 'GCHP-CEDS 2019',
 data_folder = ['CF03-SZA50-QA75','ceds_2018','htap_2018','edgar_2018'] # options:'CF03-SZA60-QA75' etc; 'ceds_2019' ,'htap_2018','edgar_2018'
-flabel = 'doas-SZA50_gchp-all_2018' # change here to update figure name
+flabel = 'doas-SZA50_reduced-noise_gchp-all_2018' # change here to update figure name
 year = 2018 # year of tropomi data
 
 indir   = f'./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_{data_folder[0]}/' # need to update this name ('Tesselation')
@@ -85,10 +85,11 @@ for idx, file in enumerate(data_label):
     # loop through months
     for month_index in range(1,13):  
         if file == 'TROPOMI 2018':
-            fname = f"{indir}Tropomi_Regrid_{year}{month_index:02d}_{data_folder[idx]}.nc"
+            # fname = f"{indir}Tropomi_Regrid_{year}{month_index:02d}_{data_folder[idx]}.nc"
+            fname = f"{indir}/gchp_so2_cosampled_tropomi_{data_folder[1]}_{month_index:02d}.nc"
             if os.path.exists(fname):
                 ds = xr.open_dataset(fname)
-                mapdata = ds['so2'].values.T
+                mapdata = ds['so2_tro'].values.T
                 lat  = ds['lat'].values
                 lon  = ds['lon'].values
                 mapdata = mapdata/2.69e16
@@ -105,7 +106,21 @@ for idx, file in enumerate(data_label):
             data = loadmat(rfname)
             mapdata, lat, lon = data['so2'], data['tlat'], data['tlon']
             mapdata = mapdata/2.69e16
+        elif file == 'GCHP-CEDS 2018':
+            fname = f"{indir}/gchp_so2_cosampled_tropomi_{data_folder[1]}_{month_index:02d}.nc"
+            if os.path.exists(fname):
+                ds = xr.open_dataset(fname)
+                mapdata = ds['so2_gchp'].values.T
+                lat  = ds['lat'].values
+                lon  = ds['lon'].values
+                mapdata = mapdata/2.69e16
+            else: 
+                print(f'{fname} not found')
+                for rgid, region in enumerate(region_name):
+                    pwm_data[region][file].append(np.nan)
+                    awm_data[region][file].append(np.nan)
 
+                continue
         else:
             fname = f"{indir}/gchp_so2_cosampled_tropomi_{data_folder[idx]}_{month_index:02d}.nc"
             if os.path.exists(fname):

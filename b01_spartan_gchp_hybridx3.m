@@ -14,15 +14,15 @@ SaveDir = sfmkdir(sprintf('%s/haihuizhu/4.SPARTAN_SO4/06.spartan_gchp/',RootDir)
 
 masterfname = sprintf('pm25_so4_202407'); % file name to save
 
-S_fig_statis = 1; % run to get hybridx3 figure and the statistics
+S_fig_statis = 0; % run to get hybridx3 figure and the statistics
 S_bar = 1; % run to get bar including multiple sims
     % if s_bar is true:
-    target_sim = {'ceds_2018','htap_2018','edgar_2018'};
+    target_sim = {'ceds_2021', 'edgar_2018', 'htap_2018'};
 
 ObsYear = 2019:2023; % years that spartan data can be included (WashU)
 simyear = 2018;
-SimName = 'ceds' ; 
-SimDir = get_sim_dir(SimName, simyear);
+SimName = 'edgar' ; 
+SimDir = get_sim_dir(SimName, simyear,RootDir);
 Species = {'SO4',  'NO3',  'NH4',   'OM', 'BC',  'dust', 'SS'}; 
 
 % calculate monthly mean: both SPT and AERONET exist at the same day for at
@@ -32,11 +32,44 @@ thres_Hr = 24*6; % if there are filters sampled via 1-day period instead of 9-da
 thres_Ann = 9; % at least X months available for a year
 
 
+% get region id 
+rgidfname = sprintf('%s/region_id.mat',SaveDir);
+if ~exist(rgidfname,'file')
+    load(sprintf('%s/SPT_%s.mat',SaveDir,masterfname)) % load the corresponding spartan data
+
+    % loading regional mask
+    load('./ceds_scale_2021to2018/mask_fao_ceds_005.mat')
+    region_id = interp2(xlon(1,:),xlat(:,1),mask_region,longitudes,latitudes,'nearest');
+    region_id(7) = 3;
+    region_id(28) = 8;
+    if sum(find(isnan(region_id)))>0
+        error('Site not assigned to a region:%s',Site_cities(isnan(region_id)))
+    end
+    % trim region_name according to spartan data availability
+    unirg = unique(region_id);
+    region_id2 = nan.*region_id;
+    region_name2 = cell(length(unirg),1);
+    for ii = 1:length(unirg)
+        region_id2(region_id == unirg(ii)) = ii;
+        region_name2{ii} = region_name{unirg(ii)};
+    end
+    region_name = region_name2;
+    region_id = region_id2;
+    save(rgidfname,'region_id','Site_cities','region_name')
+else
+    load(rgidfname)
+end
+
+
+
+
+
 
 %% Make Site Mean Contour + Bar + Monthly Scatter:  ETA, PM, and AOD
 if S_fig_statis == 1
 % ==== Map background data ====
 fname = sprintf('%s/GCHP_SO2_SO4_BC_PM25_%s_%d_annual.nc',SimDir,SimName,simyear);
+% fname = sprintf('%s/GCHP_SO2_SO4_PM25_%s_%d_annual.nc',SimDir,SimName,simyear);
 
 simlat=ncread(fname,'latitude');
 simlon=ncread(fname,'longitude');
@@ -71,8 +104,7 @@ clear rowsimyear  yr trow
 cols = [findcol('PM2.5', D2_Titles) 
         findcol('SO4', D2_Titles) 
         findcol('SampledHour', D2_Titles) ];
-rows = find(ismember(D1_Dates(:,1),ObsYear)); % select one year of data to plot
-disp(size(rows))
+rows = find(ismember(D1_Dates(:,1),ObsYear)); % select one year of data to plotcl
 D1_Dates = D1_Dates(rows,:);
 sptall = squeeze( TOT(rows,cols,:) );
 pm25_sim = squeeze( pm25_sim(rows,:) );
@@ -131,9 +163,9 @@ Mn_sim_site = mean(Mn_sim,1,'omitnan');
 Mn_obs_std = std(Mn_obs,1,'omitnan'); % site std
 Mn_sim_std = std(Mn_sim,1,'omitnan');
 % making figure
-[slope,b,r2,nrmsd,nmb,n,obsm,region_name]= mkfigure_hybridx3(pm25map, simlat,simlon, ... % map 
+[slope,b,r2,nrmsd,nmb,n,obsm]= mkfigure_hybridx3(pm25map, simlat,simlon, ... % map 
                   Mn_obs_site,Mn_obs_std, Mn_sim_site,Mn_sim_std, Mn_obs_num,... % contour and bar
-                  Mn_obs, Mn_sim, Site_cities,latitudes,longitudes,spec,Legends); % scatter and labels
+                  Mn_obs, Mn_sim, Site_cities,latitudes,longitudes,spec,Legends, region_id,region_name); % scatter and labels
 % save figure
 sfname = sprintf('%s/Hybridx3_%s_%s_%d.png',SaveDir,spec,SimName,simyear);
 saveas(gcf, sfname)
@@ -158,9 +190,9 @@ Mn_sim_site = mean(Mn_sim,1,'omitnan');
 Mn_obs_std = std(Mn_obs,1,'omitnan'); % site std
 Mn_sim_std = std(Mn_sim,1,'omitnan');
 % making figure
-[slope,b,r2,nrmsd,nmb,n,obsm,region_name] = mkfigure_hybridx3(so4map, simlat,simlon, ... % map 
+[slope,b,r2,nrmsd,nmb,n,obsm] = mkfigure_hybridx3(so4map, simlat,simlon, ... % map 
                   Mn_obs_site,Mn_obs_std, Mn_sim_site,Mn_sim_std, Mn_obs_num,... % contour and bar
-                  Mn_obs, Mn_sim, Site_cities,latitudes,longitudes,spec,Legends); % scatter and labels
+                  Mn_obs, Mn_sim, Site_cities,latitudes,longitudes,spec,Legends, region_id,region_name); % scatter and labels
 % save figure
 sfname = sprintf('%s/Hybridx3_%s_%s_%d.png',SaveDir,spec,SimName,simyear);
 saveas(gcf, sfname)
@@ -183,7 +215,7 @@ if S_bar == 1
 
     spec = 'PM25';
     load_data_make_bar(SaveDir,spec,target_sim,note);
-    sfname = sprintf('%s/Bars_%s_wrong_met.png',SaveDir,spec); % change figure name
+    sfname = sprintf('%s/Bars_%s.png',SaveDir,spec); % change figure name
     saveas(gcf,sfname)
     fprintf('saving %s\n',sfname)
     close
@@ -191,7 +223,7 @@ if S_bar == 1
 
     spec = 'SO4';
     load_data_make_bar(SaveDir,spec,target_sim,note);
-    sfname = sprintf('%s/Bars_%s_wrong_met.png',SaveDir,spec);
+    sfname = sprintf('%s/Bars_%s.png',SaveDir,spec);
     saveas(gcf,sfname)
     fprintf('saving %s\n',sfname)
     close
@@ -222,28 +254,29 @@ function fig = load_data_make_bar(SaveDir,spec,target_sim,note)
         n_all(:,sid) = n;
         obsm_all(:,sid) = obsm;
     end
+    region_name{end+1} = 'All'; % statistics contain one more column as 'all'
 
     % making stat# of plots in a figure. each plot compares serveral sims
     % on serveral regions for one statistics
-    PaperSize = [0 0 1000 600]*1.2;
+    PaperSize = [0 0 800 2400]*1.2;
     fig = figure('Position',PaperSize);
  
-    subplot(2,2,  1)
+    subplot(4,1,  1)
     stats_lable = 'r2';
-    yrng = [-0.3 1.1];
+    yrng = [-0.18 1.0];
     subbar(r2_all,n_all,obsm_all,target_sim,stats_lable,region_name,yrng,note)
 
-    subplot(2,2,  2)
+    subplot(4,1,  2)
     stats_lable = 'nmb';
     yrng = [-0.6 2];
     subbar(nmb_all,n_all,obsm_all,target_sim,stats_lable,region_name,yrng,note)
 
-    subplot(2,2,  3)
+    subplot(4,1,  3)
     stats_lable = 'slope';
     yrng = [0 2.6];
     subbar(slo_all,n_all,obsm_all,target_sim,stats_lable,region_name,yrng,note)
 
-    subplot(2,2,  4)
+    subplot(4,1,  4)
     stats_lable = 'nrmsd';
     yrng = [0 2.6];
     subbar(nrmsd_all,n_all,obsm_all,target_sim,stats_lable,region_name,yrng,note)
@@ -251,16 +284,23 @@ function fig = load_data_make_bar(SaveDir,spec,target_sim,note)
 end
 
 function subbar(statistics,N,ObsM,target_sims,stats_lable,region_name,yrng,note)
-    N = N(:,1);
+    N = N(:,1); % rg x 1
     ObsM = ObsM(:,1);
 
-    FaceColor = {[0.4940 0.1840 0.5560],[0.9290 0.6940 0.1250],[0.6350 0.0780 0.1840],...
-                [0.4660 0.6740 0.1880],[0 0 0],[1 1 0],[0 0.4470 0.7410],[0.3010 0.7450 0.9330]};
+    % move 'all' to the beginning
+    idx = [size(N,1), 1:size(N,1)-1];
+    region_name = region_name(idx); % rg x 1
+    statistics = statistics(idx,:); % rg x sims
+    ObsM = ObsM(idx,:); % rg x sims
+    N = N(idx,:); % rg x sims
+
+    FaceColor = {[0.6350 0.0780 0.1840],[0.9290 0.6940 0.1250],[0 0.4470 0.7410],...
+                [0.4660 0.6740 0.1880],[0 0 0],[1 1 0],[0.4940 0.1840 0.5560],[0.3010 0.7450 0.9330]};
     X = categorical(region_name);
     X = reordercats(X,region_name);
     
-    for sp = 1:numel(region_name)
-        s = bar(X(sp),statistics(sp,:),1);
+    for rg = 1:numel(region_name)
+        s = bar(X(rg),statistics(rg,:),1);
      
         % fomatting and style
         for ssi = 1:size(statistics,2) % statistics = regions x sims
@@ -271,32 +311,32 @@ function subbar(statistics,N,ObsM,target_sims,stats_lable,region_name,yrng,note)
 
         if ismember(stats_lable,'r2') % only label N and M for R2
             if size(statistics,2)>1
-                xtips1 = sp; % center is the index of spec
+                xtips1 = rg; % center is the index of spec
             else
                 xtips1 = s(1).XEndPoints;
             end
 
-            numstr = sprintf('N=%d', N(sp));
+            numstr = sprintf('N=%d', N(rg));
             if ~isempty(ObsM)
-                numstr = sprintf('%s\nM=%.2f',numstr,ObsM(sp));
+                numstr = sprintf('%s\nM=%.2f',numstr,ObsM(rg));
             end
             labels1 = string(numstr);
 
-            if statistics(sp)>0
+            if statistics(rg)>0
                 ytips1 = -0.05;
                 text(xtips1,ytips1,labels1,'HorizontalAlignment','center',...
-                    'VerticalAlignment','top','fontsize',11)
+                    'VerticalAlignment','top','fontsize',12)
             else
                 ytips1 = 0.05;
                 text(xtips1,ytips1,labels1,'HorizontalAlignment','center',...
-                    'VerticalAlignment','bottom','fontsize',11)
+                    'VerticalAlignment','bottom','fontsize',12)
             end
 
             notes = sprintf('N = number of observations\nM = mean of the observations');
-            text(2,0.7,notes, ...
-                'horizontalalignment','left','verticalalignment','bottom','color','k','fontsize',16);
-            text(2,1.05,note, ...
-                'horizontalalignment','left','verticalalignment','top','color','k','fontsize',16,'FontWeight','bold');
+            text(3.2,0.95,notes, ...
+                'horizontalalignment','left','verticalalignment','top','color','k','fontsize',18);
+%             text(3,0.95,note, ...
+%                 'horizontalalignment','left','verticalalignment','top','color','k','fontsize',18,'FontWeight','bold');
         end
 
         hold on
@@ -315,21 +355,22 @@ function subbar(statistics,N,ObsM,target_sims,stats_lable,region_name,yrng,note)
         case 'r2'
              ylabel('Coefficient of determination');
              legend(target_sims,'Location','northwest') % only give r2 and nrmsd legends
+             xticklabels({}) % hide x tick label for manuscript
         case 'nmb'
             ylabel('Normalized Mean Bias')
         case 'slope'
             ylabel('Slope')
             y = ones;
             plot(X,y,':k')
+            xticklabels({})% hide x tick label for manuscript
         case 'nrmsd'
             ylabel('Normalized Root Mean Square Deviation')
             legend(target_sims,'Location','northeast') % only give r2 and nrmsd legends
     end
 
     ylim(yrng)
-    set(gca ,'FontName', 'Arial', 'FontSize',16);
+    set(gca ,'FontName', 'Arial', 'FontSize',18);
 
-    
 
 
 end
@@ -364,7 +405,7 @@ switch specie
         units = '\mug/m^3';
         maprange = [0 10] ;
         ylimbar = [0 15];
-        rng = [0 40]; % scatter range
+        rng = [0 28]; % scatter range
     case 'NO3'
         Ylabels='Nitrate';
         units = '\mug/m^3';
@@ -407,8 +448,8 @@ end
 
 end
 
-function [m,b,r2,nrmsd,nmb,n,obsm,Region_name] = mkfigure_hybridx3(mapdata, simlat,simlon, bar_obs_site,bar_obs_std, bar_sim_site,bar_sim_std, bar_obs_num,...
-                            scatter_obs, scatter_sim, Site_cities,latitudes,longitudes,specie,Legends)
+function [m,b,r2,nrmsd,nmb,n,obsm] = mkfigure_hybridx3(mapdata, simlat,simlon, bar_obs_site,bar_obs_std, bar_sim_site,bar_sim_std, bar_obs_num,...
+                            scatter_obs, scatter_sim, Site_cities,latitudes,longitudes,specie,Legends, region_id,region_name)
 
 [Ylabels, units, maprange,ylimbar,rng]  = getRngNLabels(specie);
 % Ylabels = species print name; rng = range for scatter 
@@ -416,9 +457,11 @@ function [m,b,r2,nrmsd,nmb,n,obsm,Region_name] = mkfigure_hybridx3(mapdata, siml
 PaperSize = [0 0 1000 600]*1.2;
 
 fontsize = 12;
-Styles = {'o','>','h','s','^','d','<','v','p','*'};
-Colors = {'#D95319','#4DBEEE','#77AC30','#FFFF00'}; %,'#0072BD'
-
+Styles = {'o','>','h','s','^','d','<','p','v','*'};
+% Colors = {'#D95319','#4DBEEE','#77AC30','#FFFF00','#0072BD'}; %,
+Colors = {[0.6350 0.0780 0.1840],[0 0.4470 0.7410],[0.9290 0.6940 0.1250],...
+            [0.4660 0.6740 0.1880],[1 1 0],[0.4940 0.1840 0.5560],...
+            [0.3010 0.7450 0.9330],[ 0.4667 0.6745 0.1882],[ 0.8510 0.3255 0.0980],[0,0,0]};
 latmin = -45;
 latmax = 60;
 lonmin = -155;
@@ -427,43 +470,31 @@ fw = 0.65;
 fh = fw * ((latmax-latmin)/180) / ((lonmax-lonmin)/360) ; % inner figure height 
 Positions = [0.1   0.45  fw   fh ;
              0.1   0.15  0.4  0.3;
-             0.5   0.15  0.3  0.3];
+             0.5   0.15  0.5  0.3]; % change the width of scatter 
 
-% ====  assign regions (NA, EU, AS, Other) ==== 
-Regions = [-139.56 -51.62  21.06 60.14; % NA
-           % -15.5   31      37    90;    % EU
-           68      134.675  -10     53.51]; % Asia
-Region_name = {'NA','AS','Other'};
-rgID = (size(Regions,1)+1) * ones(size(latitudes));
 for i = 1:length(latitudes)
-    for rg = 1:max(rgID)-1
-        if longitudes(i) > Regions(rg,1) && longitudes(i) < Regions(rg,2) && ...
-           latitudes(i) > Regions(rg,3) && latitudes(i) < Regions(rg,4)
-            rgID(i) = rg;
-        end
-    end
     if isnan(bar_obs_site(i)) % no any value available
-        rgID(i) = NaN; % so that can be deleted later 
+        region_id(i) = NaN; % so that can be deleted later 
     end
 end
 
 % ==== Sort data by region & delete empty site ==== 
-[rgID, I] = sort(rgID) ;
-bar_obs_site = sortNdelete(bar_obs_site,I,rgID);
-bar_obs_std = sortNdelete(bar_obs_std,I,rgID);
-bar_sim_site  = sortNdelete(bar_sim_site,I,rgID);
-bar_sim_std =  sortNdelete(bar_sim_std,I,rgID);
-bar_obs_num = sortNdelete(bar_obs_num,I,rgID);
-latitudes = sortNdelete(latitudes,I,rgID);
-longitudes = sortNdelete(longitudes,I,rgID);
-Site_cities = sortNdelete(Site_cities,I,rgID);
+[region_id, I] = sort(region_id) ;
+bar_obs_site = sortNdelete(bar_obs_site,I,region_id);
+bar_obs_std = sortNdelete(bar_obs_std,I,region_id);
+bar_sim_site  = sortNdelete(bar_sim_site,I,region_id);
+bar_sim_std =  sortNdelete(bar_sim_std,I,region_id);
+bar_obs_num = sortNdelete(bar_obs_num,I,region_id);
+latitudes = sortNdelete(latitudes,I,region_id);
+longitudes = sortNdelete(longitudes,I,region_id);
+Site_cities = sortNdelete(Site_cities,I,region_id);
 
 scatter_obs = scatter_obs(:,I);
 scatter_sim = scatter_sim(:,I);
-scatter_obs(:,isnan(rgID)) = [];
-scatter_sim(:,isnan(rgID)) = [];
+scatter_obs(:,isnan(region_id)) = [];
+scatter_sim(:,isnan(region_id)) = [];
 
-rgID(isnan(rgID)) = [];
+region_id(isnan(region_id)) = [];
 
 figure('Position',PaperSize);
 % ==== make background map ==== 
@@ -521,10 +552,11 @@ set(gca ,'FontName', 'Arial', 'FontSize',fontsize);
 legend(Legends,'Location','northwest','FontSize',fontsize+2)
 
 % ==== make scatter ====
+unirg = unique(region_id);
 subplot('Position',Positions(3,:))
-for rg = 1:max(rgID)
-    X = reshape(scatter_obs(:,rgID == rg),[],1);
-    Y = reshape(scatter_sim(:,rgID == rg),[],1);
+for rg = 1:length(unirg)
+    X = reshape(scatter_obs(:,region_id == unirg(rg)),[],1);
+    Y = reshape(scatter_sim(:,region_id == unirg(rg)),[],1);
     C = rg.*ones(size(X));
     s = scatter(X, Y, 24,C,Styles{rg},'filled');
     [~,m(rg),b(rg),r2(rg),nrmsd(rg),nmb(rg),obsm(rg),n(rg)] = get_all_Statics(X,Y);
@@ -564,7 +596,7 @@ plot(xl,yl,'-r','Linewidth',1)
 % calculate poplulation weighted mean
 if ~exist('tpop','Var')
     load('Population-0.05.mat')
-    tpop = interp2(LAT,LON,pop,latitudes,longitudes);
+    tpop = interp2(tLAT',tLON,npop,latitudes,longitudes);
     clear pop popm LAT LON
 end
 
@@ -595,11 +627,10 @@ plot(xl,y3,'--k')
 % 1:2 line
 y3=2*xl;
 plot(xl,y3,'--k')
-legend_label = Region_name;
+legend_label = region_name;
 legend_label(end+1:end+3) = {'Fit Line','1:1 Line','2:1 Line'};
-legend(legend_label,'Location','northeast')
+legend(legend_label,'Location','eastoutside')
 
-Region_name{end+1} = 'All'; % Now the region_name serve for the statistics label.
 pause(3)
 end
 

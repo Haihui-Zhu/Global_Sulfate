@@ -1,0 +1,157 @@
+Using default tag: latest
+latest: Pulling from zhuhh3/matlab_env
+d7bfe07ed847: Pulling fs layer
+75eccf561042: Pulling fs layer
+191419884744: Pulling fs layer
+a17a942db7e1: Pulling fs layer
+16156c70987f: Pulling fs layer
+f377cd1a6243: Pulling fs layer
+acff352ce6e3: Pulling fs layer
+0e462392d5ae: Pulling fs layer
+87173e23a0c6: Pulling fs layer
+281e0228095a: Pulling fs layer
+0f33b1b0103e: Pulling fs layer
+7d2bba0bece8: Pulling fs layer
+de215ce0555a: Pulling fs layer
+0e462392d5ae: Waiting
+87173e23a0c6: Waiting
+281e0228095a: Waiting
+a17a942db7e1: Waiting
+16156c70987f: Waiting
+f377cd1a6243: Waiting
+acff352ce6e3: Waiting
+0f33b1b0103e: Waiting
+7d2bba0bece8: Waiting
+de215ce0555a: Waiting
+191419884744: Verifying Checksum
+191419884744: Download complete
+75eccf561042: Verifying Checksum
+75eccf561042: Download complete
+d7bfe07ed847: Verifying Checksum
+d7bfe07ed847: Download complete
+a17a942db7e1: Verifying Checksum
+a17a942db7e1: Download complete
+16156c70987f: Download complete
+acff352ce6e3: Download complete
+d7bfe07ed847: Pull complete
+75eccf561042: Pull complete
+191419884744: Pull complete
+a17a942db7e1: Pull complete
+87173e23a0c6: Verifying Checksum
+87173e23a0c6: Download complete
+16156c70987f: Pull complete
+0e462392d5ae: Verifying Checksum
+0e462392d5ae: Download complete
+281e0228095a: Verifying Checksum
+281e0228095a: Download complete
+0f33b1b0103e: Verifying Checksum
+0f33b1b0103e: Download complete
+de215ce0555a: Download complete
+7d2bba0bece8: Verifying Checksum
+7d2bba0bece8: Download complete
+f377cd1a6243: Verifying Checksum
+f377cd1a6243: Download complete
+f377cd1a6243: Pull complete
+acff352ce6e3: Pull complete
+0e462392d5ae: Pull complete
+87173e23a0c6: Pull complete
+281e0228095a: Pull complete
+0f33b1b0103e: Pull complete
+7d2bba0bece8: Pull complete
+de215ce0555a: Pull complete
+Digest: sha256:02b1cfed996382e3cb4773c74fa403479d91985c743f1c15a6c70816404c1599
+Status: Downloaded newer image for zhuhh3/matlab_env:latest
+docker.io/zhuhh3/matlab_env:latest
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2021 The MathWorks, Inc.
+                  R2021b (9.11.0.1769968) 64-bit (glnxa64)
+                             September 17, 2021
+
+ 
+To get started, type doc.
+For product information, visit www.mathworks.com.
+ 
+Elapsed time is 123.006516 seconds.
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_01.nc saved
+Elapsed time is 107.102334 seconds.
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_02.nc saved
+Elapsed time is 119.998461 seconds.
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_03.nc saved
+Elapsed time is 116.116468 seconds.
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_04.nc saved
+Elapsed time is 133.632942 seconds.
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_05.nc saved
+Elapsed time is 128.752558 seconds.
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_06.nc saved
+Elapsed time is 114.887452 seconds.
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_07.nc saved
+Elapsed time is 122.607710 seconds.
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_08.nc saved
+Elapsed time is 112.004387 seconds.
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_09.nc saved
+Elapsed time is 116.862454 seconds.
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_10.nc saved
+Elapsed time is 113.711827 seconds.
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_11.nc saved
+Elapsed time is 115.655310 seconds.
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_12.nc saved
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_01.nc added
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_02.nc added
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_03.nc added
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_04.nc added
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_05.nc added
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_06.nc added
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_07.nc added
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_08.nc added
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_09.nc added
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_10.nc added
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_11.nc added
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_12.nc added
+./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_CF03-SZA60-QA75/gchp_so2_cosampled_tropomi_ceds_2021_annual.nc saved
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@compute1-exec-291.ris.wustl.edu>
+Subject: Job 230569: <cosamp-ceds21> in cluster <compute1-lsf> Done
+
+Job <cosamp-ceds21> was submitted from host <compute1-client-1.ris.wustl.edu> by user <haihuizhu> in cluster <compute1-lsf> at Sun Sep 29 10:13:19 2024
+Job was executed on host(s) <8*compute1-exec-291.ris.wustl.edu>, in queue <rvmartin>, as user <haihuizhu> in cluster <compute1-lsf> at Sun Sep 29 10:13:21 2024
+</home/haihui> was used as the home directory.
+</home/haihui/my-projects/4.SPARTAN_SO4> was used as the working directory.
+Started at Sun Sep 29 10:13:21 2024
+Terminated at Sun Sep 29 10:39:25 2024
+Results reported at Sun Sep 29 10:39:25 2024
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#BSUB -n 8
+#BSUB -R "rusage[mem=64G] span[hosts=1] select[mem < 500GB] order[-slots]"
+#BSUB -q rvmartin
+#BSUB -a 'docker(zhuhh3/matlab_env)'
+#BSUB -o job-matlab-%J.txt
+#BSUB -J "cosamp-ceds21"
+
+cd /storage1/fs1/rvmartin/Active/haihuizhu/4.SPARTAN_SO4
+matlab -nodisplay -r "a05_cosamle_gchp_tropomi; exit"
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   552.51 sec.
+    Max Memory :                                 109145026 MB
+    Average Memory :                             1249061.50 MB
+    Total Requested Memory :                     65536.00 MB
+    Delta Memory :                               -109079488.00 MB
+    Max Swap :                                   4028 MB
+    Max Processes :                              11
+    Max Threads :                                17
+    Run time :                                   1566 sec.
+    Turnaround time :                            1566 sec.
+
+The output (if any) is above this job summary.
+

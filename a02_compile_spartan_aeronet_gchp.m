@@ -7,7 +7,7 @@
 clear 
 close all
 
-% RootDir = '/Volumes/rvmartin/Active/'; % run locally
+% RootDir = '/Volumes/rvmartin/Active/'; % run locally % doesn't work since soft links can't be found locally
 RootDir = '/storage1/fs1/rvmartin/Active/'; % run on compute1
 addpath(sprintf('%s/haihuizhu/1.code',RootDir))
 addpath(sprintf('%s/haihuizhu/4.SPARTAN_SO4/functions',RootDir))
@@ -27,9 +27,9 @@ D1_Dates = D1_Dates(:,1:3); % 'YEAR','MONTH','DATE'
 S_RawFiltered = 0; % Read raw filter-based SPARTAN data
 
 S_gchp = 1;
-    simyear = 2018;
+    simyear = 2021;
     SimName = 'ceds';
-    SimDir = get_sim_dir(SimName, simyear);
+    SimDir = get_sim_dir(SimName, simyear,RootDir);
 
 
 site_details = readtable(sprintf('%s/SPARTAN-shared/Site_Sampling/Site_details.xlsx',RootDir));
@@ -122,7 +122,8 @@ if S_gchp == 1
     
     for d = 1:length(SimDatesNum)
         tic
-        fname = sprintf('%s/GCHP_SO2_SO4_BC_PM25_%s_%d_%.2d%.2d.nc',SimDir,SimName,simyear,SimDatesVec(d,2),SimDatesVec(d,3));
+%         fname = sprintf('%s/GCHP_SO2_SO4_BC_PM25_%s_%d_%.2d%.2d.nc',SimDir,SimName,simyear,SimDatesVec(d,2),SimDatesVec(d,3));
+        fname = sprintf('%s/GCHP_SO2_SO4_PM25_%s_%d_%.2d%.2d.nc',SimDir,SimName,simyear,SimDatesVec(d,2),SimDatesVec(d,3));
 
         dd = find(DatesNum == SimDatesNum(d));
         if exist(fname,'file')

@@ -79,49 +79,49 @@ def savefig(fname, fig):
 
 
 ### main starts here ###
-simname = 'ceds_2018'
-year = 2018
-qcstr =  'CF03-SZA60-QA90'
-for mn in range(5,13):
-    source1 = f'./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_{qcstr}/Tropomi_Regrid_{year}{mn:02d}_{qcstr}.nc'
-    source2 = f'./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_{qcstr}/gchp_so2_cosampled_tropomi_{simname}_{mn:02d}.nc'
-    savedir = f'./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_{qcstr}/'
+simname = 'ceds_2021'
+year = 2021
+qcstr =  'CF03-SZA60-QA75'
+# for mn in range(5,13):
+source1 = f'./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_{qcstr}/Tropomi_Regrid_{year}_{qcstr}.nc'
+source2 = f'./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_{qcstr}/gchp_so2_cosampled_tropomi_{simname}_annual.nc'
+savedir = f'./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_{qcstr}/'
 
-    ### Figure 1: comparing global so2 from cobra + gchp ###
-    ds = xr.open_dataset(source1) 
-    so2_1 = ds['so2'].values.T # check variable name
-    so2_1 = so2_1/2.69e16 # convert unit
-    lat = ds['lat'].values # presumably all sources share the same lat lon
-    lon = ds['lon'].values
+### Figure 1: comparing global so2 from cobra + gchp ###
+ds = xr.open_dataset(source1) 
+so2_1 = ds['so2'].values.T # check variable name
+so2_1 = so2_1/2.69e16 # convert unit
+lat = ds['lat'].values # presumably all sources share the same lat lon
+lon = ds['lon'].values
 
-    # ds = xr.open_dataset(source1)
-    # so2_vol = ds['so2_vol'].values.T# adding volcanoes
-    # so2_vol = so2_vol/2.69e16
-    # # sum with nan:
-    # array1_no_nan = np.nan_to_num(so2_pbl, nan=0.0)
-    # array2_no_nan = np.nan_to_num(so2_vol, nan=0.0)
-    # sum_array = array1_no_nan + array2_no_nan
-    # nan_mask = np.isnan(so2_pbl) & np.isnan(so2_vol)
-    # so2_1 = np.where(nan_mask, np.nan, sum_array)
-
-
-    ds = xr.open_dataset(source2) 
-    so2_2 = ds['so2'].values.T # check variable name
-    so2_2 = so2_2/2.69e16 # convert unit
+# ds = xr.open_dataset(source1)
+# so2_vol = ds['so2_vol'].values.T# adding volcanoes
+# so2_vol = so2_vol/2.69e16
+# # sum with nan:
+# array1_no_nan = np.nan_to_num(so2_pbl, nan=0.0)
+# array2_no_nan = np.nan_to_num(so2_vol, nan=0.0)
+# sum_array = array1_no_nan + array2_no_nan
+# nan_mask = np.isnan(so2_pbl) & np.isnan(so2_vol)
+# so2_1 = np.where(nan_mask, np.nan, sum_array)
 
 
-    # Plot set up
-    regions, extents, fig, gs = plot_setup()
-    # Plotting the global map 
-    ax_global = fig.add_subplot(gs[0, :], projection=ccrs.PlateCarree())
-    plot_map(so2_1, lat, lon,extents, "TROPOMI-DOAS-QA90 $SO_2$", ax_global)
-    ax_global = fig.add_subplot(gs[1, :], projection=ccrs.PlateCarree())
-    plot_map(so2_2, lat, lon,extents, "GCHP $SO_2$ ", ax_global)
-    ax_global = fig.add_subplot(gs[2, :], projection=ccrs.PlateCarree())
-    plot_map(so2_2-so2_1, lat, lon,extents, 'GCHP-TROPOMI', ax_global, diff_cmap=True)
+ds = xr.open_dataset(source2) 
+so2_2 = ds['so2_gchp'].values.T # check variable name
+so2_2 = so2_2/2.69e16 # convert unit
 
-    plt.suptitle(f"$SO_2$ Maps")
-    # save figure
-    fname = f"{savedir}map_so2_doas-{qcstr}_vs_{simname}_{mn}.png"
-    savefig(fname, fig)
+
+# Plot set up
+regions, extents, fig, gs = plot_setup()
+# Plotting the global map 
+ax_global = fig.add_subplot(gs[0, :], projection=ccrs.PlateCarree())
+plot_map(so2_1, lat, lon,extents, "TROPOMI-DOAS $SO_2$", ax_global)
+ax_global = fig.add_subplot(gs[1, :], projection=ccrs.PlateCarree())
+plot_map(so2_2, lat, lon,extents, "GCHP $SO_2$ ", ax_global)
+ax_global = fig.add_subplot(gs[2, :], projection=ccrs.PlateCarree())
+plot_map(so2_2-so2_1, lat, lon,extents, 'GCHP-TROPOMI', ax_global, diff_cmap=True)
+
+plt.suptitle(f"$SO_2$ Maps")
+# save figure
+fname = f"{savedir}map_so2_doas-{qcstr}_vs_{simname}_annual.png"
+savefig(fname, fig)
 
