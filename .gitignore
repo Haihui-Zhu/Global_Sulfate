@@ -18,6 +18,7 @@ amfv5.11.so2.geos5_omi.tar
 *.asv
 *.bsub
 *.batch
+job-matlab*
 CEDS-*
 GCHP_13.4.0_Aerosol
 HTAPv3
