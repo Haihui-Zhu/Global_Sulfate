@@ -20,13 +20,30 @@ def savefig(fname, fig):
 
 def make_plot(awm_data,Ylabel,emission_labels):
     target_regions = ['Africa','America-Central and South', 'America-North','Asia Pacific','Asia-East','Asia-South','Asia-Southeast','Australasia','Middle East'] # regions that will be shown in the plots   
-    markers = ['b-','b--','r-','r--','g--'];
+    markers = ['-','--','-','--','--'];
+    colors = ['firebrick','firebrick','goldenrod','goldenrod','steelblue'];
     fig = plt.figure(figsize=(10, 10))
     gs = gridspec.GridSpec(3, 3, figure=fig)
     for i, region in enumerate(target_regions):
         ax = fig.add_subplot(gs[i // 3, i % 3])
+        print(region)
         for ff, file in enumerate(emission_labels):
-            ax.plot(list(range(1, 13)), awm_data[region][file], markers[ff], label=f'{file}')
+            ax.plot(list(range(1, 13)), awm_data[region][file], markers[ff], label=f'{file}', color=colors[ff])
+            # Calculate mean and add as text
+            mean_value = np.mean(awm_data[region][file])
+            if '2021' in file:
+                ax.text(0.95, 0.31-0.06*ff, f'{mean_value:.2e}', transform=ax.transAxes, 
+                        horizontalalignment='right', verticalalignment='bottom', 
+                        fontsize=10,weight='bold', color=colors[ff])
+            else:
+                ax.text(0.95, 0.31-0.06*ff, f'{mean_value:.2e}', transform=ax.transAxes, 
+                        horizontalalignment='right', verticalalignment='bottom', 
+                        fontsize=10,color=colors[ff])
+            if ff == 0:
+                ref_value = mean_value
+
+            print(f'{mean_value/ref_value:.3f}')
+
         ax.set_title(region)
         ax.set_xticks(range(1, 13, 2))
         ax.set_xticklabels(['Jan', 'Mar','May', 'Jul', 'Sep', 'Nov'])
@@ -40,7 +57,6 @@ def make_plot(awm_data,Ylabel,emission_labels):
     plt.tight_layout()
     plt.show()
     return fig
-
 
 save_path = '04.Seasonality_Figures/'
 
@@ -61,8 +77,8 @@ region_name = [item[0] for item in region_name_array.flatten()]
 ###### SO2 emission inventories ####
 data_label = ['CEDS-2021', 'CEDS-2018','EDGAR-2021','EDGAR-2018', 'HTAP-2018']
 species = ['BC','CO','NH3','NMVOC','NOx','OC','SO2']
-sectors = ['ENE','IND','TRA','RCO','SLV','AGR','AVA','SHP','WST','AWB','SOL']
-# sectors = ['ENE','TRA','IND']
+# sectors = ['ENE','IND','TRA','RCO','SLV','AGR','AVA','SHP','WST','AWB','SOL']
+sectors = ['SLV','AGR','AVA','SHP','WST','AWB','SOL']
 
 
 spec = 'SO2'

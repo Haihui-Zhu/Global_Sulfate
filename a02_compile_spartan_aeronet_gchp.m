@@ -13,7 +13,7 @@ addpath(sprintf('%s/haihuizhu/1.code',RootDir))
 addpath(sprintf('%s/haihuizhu/4.SPARTAN_SO4/functions',RootDir))
 SaveDir = sfmkdir(sprintf('%s/haihuizhu/4.SPARTAN_SO4/06.spartan_gchp/',RootDir)); % save to compute1
 
-masterfname = sprintf('pm25_so4_202407'); % file name to save
+masterfname = sprintf('pm25_so4_202410'); % file name to save
 
 % SPARTAN species
 Species     = {'PM2.5','SO4',  'NO3',  'NH4',  'BC',   'OM',   'dust', 'SS','SampledHour'}; 
@@ -31,6 +31,9 @@ S_gchp = 1;
     SimName = 'ceds';
     SimDir = get_sim_dir(SimName, simyear,RootDir);
 
+S_tropomi = 0;
+    year = 2021;
+    qcstr = 'CF03-SZA50-QA75';
 
 site_details = readtable(sprintf('%s/SPARTAN-shared/Site_Sampling/Site_details.xlsx',RootDir));
 Site_cities = table2array(site_details(:,3));
@@ -119,10 +122,11 @@ if S_gchp == 1
     
     pm25_sim = NaN.*zeros(length(D1_Dates),length(D3_SiteCode));
     so4_sim = NaN.*zeros(length(D1_Dates),length(D3_SiteCode));
+    so2_sim = NaN .* zeros(length(D1_Dates), length(D3_SiteCode));
     
     for d = 1:length(SimDatesNum)
         tic
-%         fname = sprintf('%s/GCHP_SO2_SO4_BC_PM25_%s_%d_%.2d%.2d.nc',SimDir,SimName,simyear,SimDatesVec(d,2),SimDatesVec(d,3));
+        % fname = sprintf('%s/GCHP_SO2_SO4_BC_PM25_%s_%d_%.2d%.2d.nc',SimDir,SimName,simyear,SimDatesVec(d,2),SimDatesVec(d,3));
         fname = sprintf('%s/GCHP_SO2_SO4_PM25_%s_%d_%.2d%.2d.nc',SimDir,SimName,simyear,SimDatesVec(d,2),SimDatesVec(d,3));
 
         dd = find(DatesNum == SimDatesNum(d));
@@ -136,6 +140,9 @@ if S_gchp == 1
 
             so4=ncread(fname,'so4');
             so4_sim(dd,:) = interp2(lon',lat,so4,longitudes,latitudes); 
+
+            so2 = ncread(fname, 'so2');
+            so2_sim(dd, :) = interp2(lon', lat, so2, longitudes, latitudes);
             
         else
             fprintf('%s not found \n',fname)
@@ -145,9 +152,52 @@ if S_gchp == 1
     fprintf('Done reading Sim from %s.\n',SimName)
 
     save(sprintf('%s/SIM_%s_%s-%d.mat',SaveDir,masterfname,SimName,simyear),...
-        'pm25_sim','so4_sim','Site_cities','D3_SiteCode','latitudes','longitudes','Species','DatesNum','D1_Dates')
+        'pm25_sim','so4_sim','so2_sim','Site_cities','D3_SiteCode','latitudes','longitudes','Species','DatesNum','D1_Dates')
 
 end
+
+%% Read TROPOMI SO2
+if S_tropomi == 1
+
+    diary(sprintf('%s/%s_%s_record_tropomi_%s-%d.txt', SaveDir, masterfname, datestr(today, 'yyyy-mm-dd'), SimName, year))
+    fprintf('%s \n', datestr(today))
+
+    load(sprintf('%s/SPT_%s.mat', SaveDir, masterfname)) % load the corresponding spartan data
+
+    SatDatesNum = datenum([year 01 01]):1:datenum([year 12 31]);
+    SatDatesVec = datevec(SatDatesNum);
+
+    so2_tro = NaN .* zeros(length(D1_Dates), length(D3_SiteCode));
+
+    for d = 1:length(SatDatesNum)
+        tic
+        fname = sprintf('./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_%s/Tropomi_Regrid_%d%.2d%.2d_%s.nc', ...
+                        qcstr, year, SatDatesVec(d, 2), SatDatesVec(d, 3), qcstr);
+
+        dd = find(DatesNum == SatDatesNum(d));
+
+        if exist(fname, 'file')
+
+            lat = ncread(fname, 'lat');
+            lon = ncread(fname, 'lon');
+
+            so2 = ncread(fname, 'so2');
+            so2_tro(dd, :) = interp2(lon', lat, so2, longitudes, latitudes);
+
+        else
+            fprintf('%s not found \n', fname)
+        end
+
+        toc
+    end
+
+    fprintf('Done reading Sim from tropomi %d.\n', year)
+
+    save(sprintf('%s/TROPOMI_%s-%d.mat', SaveDir, masterfname, year), ...
+        'so2_tro', 'Site_cities', 'D3_SiteCode', 'latitudes', 'longitudes','DatesNum', 'D1_Dates')
+
+end
+
 %%
 diary off
 clear S_*

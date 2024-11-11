@@ -9,7 +9,11 @@ switch SimName
         end
     case 'htap'
         SimDir = sprintf('%s/haihuizhu/4.SPARTAN_SO4/05.GCHP_outputs/2.htap_2018', RootDir);
-    case 'edgar'
+case 'edgar'
+    if simyear == 2018
         SimDir = sprintf('%s/haihuizhu/4.SPARTAN_SO4/05.GCHP_outputs/3.edgar_2018', RootDir);
+    elseif simyear == 2021
+        SimDir = sprintf('%s/haihuizhu/4.SPARTAN_SO4/05.GCHP_outputs/5.edgar_2021', RootDir);
+    end
 end
 

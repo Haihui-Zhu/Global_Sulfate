@@ -1,16 +1,16 @@
 % July-17-2024
 % Haihui Zhu
 
-% Read SO2, SO4, PM25 from GCHP ACAG and ConcAboveSfc collections
+% Read SO2, SO4, BC, PM25 from GCHP ACAG and ConcAboveSfc collections
 % SO2 is sampled at TROPOMIT overpass time.
 clear 
 close all
 
 % ---- Input & Switches --------------
-YEARS = 2021; % year range of interest, currently means year of simulation
-SimName  = 'ceds_2021'; % change here
-InDir  = './4.ceds_2021/OutputDir/'; % change here
-OutDir = './4.ceds_2021/processed/'; % change here
+YEARS = 2018; % year range of interest, currently means year of simulation
+SimName  = 'edgar_2018'; % change here
+InDir  = '/nobackup/hzhu3/3.edgar_2018/OutputDir/'; % change here
+OutDir = '/nobackup/hzhu3/3.edgar_2018/processed/'; % change here
 
 Mns = 1:12;
 % ---- End of input ----------------------
@@ -63,7 +63,7 @@ for Yr = YEARS
 
         for Dy = 1:daysinmonth(Mn)
             tic
-            sfname = sprintf('%s/GCHP_SO2_SO4_PM25_%s_%.2d%.2d.nc',OutDir,SimName,Mn,Dy);
+            sfname = sprintf('%s/GCHP_SO2_SO4_BC_PM25_%s_%.2d%.2d.nc',OutDir,SimName,Mn,Dy);
             if exist(sfname,'file') % for re-run without repeating work
                 so2 = ncread(sfname,'so2');
                 so4 = ncread(sfname,'so4');
@@ -115,19 +115,12 @@ for Yr = YEARS
                     % this has the same problem as algorithm 1 but is easier to
                     % read, more concise.
                     % see Sat_overpass_time_cheatsheet.xlsx (on onedrive) for reasonings
-                    % updated on Aug 26, 2024
-                    center = (13-Hr)*15;
-                    if center == 180
-                        LonR1 = find(tLON >= 180-7.5 & tLON < 180);
-                        LonR2 = find(tLON >= -180 & tLON < -180+7.5);
-                        LonRng = [LonR1 LonR2];
-                    elseif center > 180
-                        center = -180+(center-180);
-                        LonRng = find(tLON >= center-7.5 & tLON < center+7.5);
-                    else
-                        LonRng = find(tLON >= center-7.5 & tLON < center+7.5);
+                    loc = (13-Hr)*15;
+                    if loc > 180
+                        loc = -180+(loc-180);
                     end
-                    so2d(:,LonRng,:) = so2d(:,LonRng,:) + so2h(:,LonRng,:);
+                    LonInd = find(tLON >= loc-7.5 & tLON < loc+7.5);
+                    so2d(:,LonInd,:) = so2d(:,LonInd,:) + so2h(:,LonInd,:);
                     pm25d = pm25h + pm25d;
                     so4d = so4h + so4d;
                     bcd = bch + bcd;
@@ -154,7 +147,7 @@ for Yr = YEARS
         pm25 = pm25m ./ Dy; clear pm25m
         bc = bcm ./ Dy; clear bcm
         % save monthly data
-        sfname = sprintf('%s/GCHP_SO2_SO4_PM25_%s_%.2d.nc',OutDir,SimName,Mn);
+        sfname = sprintf('%s/GCHP_SO2_SO4_BC_PM25_%s_%.2d.nc',OutDir,SimName,Mn);
         savenc(sfname,so2,so4,pm25,bc,tLAT, tLON)
         fprintf('%s saved\n',sfname)
 
@@ -170,7 +163,7 @@ for Yr = YEARS
     pm25 = pm25y./Mn; clear pm25y
     bc = bcy./Mn; clear bcy
     % save monthly data
-    sfname = sprintf('%s/GCHP_SO2_SO4_PM25_%s_annual.nc',OutDir,SimName);
+    sfname = sprintf('%s/GCHP_SO2_SO4_BC_PM25_%s_annual.nc',OutDir,SimName);
     savenc(sfname,so2,so4,pm25,bc,tLAT, tLON)
     fprintf('%s saved\n',sfname)
 
@@ -188,6 +181,7 @@ function var = cube2latlon2d(var1,lat,lon,xLAT,xLON)
         var(var<0) = 0;
 
 end
+
 
 function savenc (sfname,so2,so4,pm25, bc, tLAT, tLON)
 
@@ -341,6 +335,19 @@ if rng(1) ==0
 elseif rng(1) < 0
     cm = cbrewer('div','RdBu',100,'spline');
     cm(cm>1) = 1;
+    cm(cm<0) = 0;
+    colormap(gca,flipud(cm));
+end
+set(gca,'clim',rng); %  colorscale = log or linear
+
+cb2=colorbar('vertical','fontsize',fz,'fontweight', 'bold','Position',cbvserpos(ps,:));
+cblb = sprintf('%s SO_2 [unitless]','\Delta');
+set(get(cb2,'YLabel'),'string',cblb,'fontsize',fz,'fontweight','bold','FontName','Helvetica');
+hold on
+
+end
+
+ = 1;
     cm(cm<0) = 0;
     colormap(gca,flipud(cm));
 end

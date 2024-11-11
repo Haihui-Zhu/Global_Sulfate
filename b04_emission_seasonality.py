@@ -3,6 +3,7 @@
 import numpy as np
 import xarray as xr
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import cartopy.crs as ccrs
 import matplotlib.gridspec as gridspec
 from scipy.io import loadmat
@@ -21,8 +22,24 @@ def make_plot(awm_data,Ylabel,emission_labels):
     gs = gridspec.GridSpec(3, 3, figure=fig)
     for i, region in enumerate(target_regions):
         ax = fig.add_subplot(gs[i // 3, i % 3])
+        print(region)
         for ff, file in enumerate(emission_labels):
             ax.plot(list(range(1, 13)), awm_data[region][file], markers[ff], label=f'{file}', color=colors[ff])
+            # Calculate mean and add as text
+            mean_value = np.mean(awm_data[region][file])
+            if '2021' in file:
+                ax.text(0.95, 0.31-0.06*ff, f'{mean_value:.2e}', transform=ax.transAxes, 
+                        horizontalalignment='right', verticalalignment='bottom', 
+                        fontsize=10,weight='bold', color=colors[ff])
+            else:
+                ax.text(0.95, 0.31-0.06*ff, f'{mean_value:.2e}', transform=ax.transAxes, 
+                        horizontalalignment='right', verticalalignment='bottom', 
+                        fontsize=10,color=colors[ff])
+            if ff == 0:
+                ref_value = mean_value
+
+            print(f'{mean_value/ref_value:.3f}')
+
         ax.set_title(region)
         ax.set_xticks(range(1, 13, 2))
         ax.set_xticklabels(['Jan', 'Mar','May', 'Jul', 'Sep', 'Nov'])

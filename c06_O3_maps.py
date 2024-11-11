@@ -1,10 +1,11 @@
-# This script makes maps of global and regional SO2 and SO4
+# This script makes maps of global O3
 
 import numpy as np
 import xarray as xr
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import matplotlib.gridspec as gridspec
+import cartopy.feature as cfeature
 
 def plot_setup():
     regions = ['Global', 'North America', 'Europe', 'East Asia', 'South Asia', 'Middle East']
@@ -56,7 +57,7 @@ def plot_map(data, lat, lon,extents, label, ax, diff_cmap=False):
     
     cax = ax.inset_axes([0.05, 0.1, 0.02, 0.5])  # Adjust these parameters as needed for placement
     cbar = plt.colorbar(mesh, cax=cax, orientation='vertical')
-    cbar.set_label('SO2 VCD (DU)',fontsize = 12)
+    cbar.set_label('O3 VCD (DU)',fontsize = 12)
     
     x, y = 0.5, 0.05  # Normalized coordinates (0, 0) is lower left, (1, 1) is upper right
     if diff_cmap:
@@ -79,49 +80,62 @@ def savefig(fname, fig):
 
 
 ### main starts here ###
-simname = 'ceds_2021'
 year = 2021
-qcstr =  'CF03-SZA60-QA75'
+qcstr =  'CF03-SZA75-QA75'
 # for mn in range(5,13):
-source1 = f'./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_{qcstr}/Tropomi_Regrid_{year}_{qcstr}.nc'
-source2 = f'./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_{qcstr}/gchp_so2_cosampled_tropomi_{simname}_annual.nc'
-savedir = f'./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_{qcstr}/'
+indir = f'/storage1/fs1/rvmartin2/Active/haihuizhu/02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_{qcstr}/'
+savedir = f'/storage1/fs1/rvmartin/Active/haihuizhu/4.SPARTAN_SO4/temp'
 
-### Figure 1: comparing global so2 from cobra + gchp ###
-ds = xr.open_dataset(source1) 
-so2_1 = ds['so2'].values.T # check variable name
-so2_1 = so2_1/2.69e16 # convert unit
-lat = ds['lat'].values # presumably all sources share the same lat lon
-lon = ds['lon'].values
+for mn in range(1,14):
+    if mn ==13:
+        fname = f"{indir}/Regrid_tropomi_O3_{year}_{qcstr}.nc"
+    else:
+        fname = f"{indir}/Regrid_tropomi_O3_{year}{mn:02d}_{qcstr}.nc"
 
-# ds = xr.open_dataset(source1)
-# so2_vol = ds['so2_vol'].values.T# adding volcanoes
-# so2_vol = so2_vol/2.69e16
-# # sum with nan:
-# array1_no_nan = np.nan_to_num(so2_pbl, nan=0.0)
-# array2_no_nan = np.nan_to_num(so2_vol, nan=0.0)
-# sum_array = array1_no_nan + array2_no_nan
-# nan_mask = np.isnan(so2_pbl) & np.isnan(so2_vol)
-# so2_1 = np.where(nan_mask, np.nan, sum_array)
+    ds = xr.open_dataset(fname) 
+    so2_1 = ds['O3'].values.T # check variable name
+    so2_1 = so2_1/2.69e16 # convert unit
+    lat = ds['lat'].values # presumably all sources share the same lat lon
+    lon = ds['lon'].values
+
+    # regrid to 0.5
+    res = 0.5
+    scale = int(res/0.05)
+    shape1 = len(lat)
+    shape2 = len(lon)
+
+    so2_1_r = so2_1.reshape(int(shape1/scale),scale,int(shape2/scale),scale)
+    so2_1_r = so2_1_r.mean(axis=(1, 3))
+
+    lat_r = lat.reshape(int(shape1/scale),scale)
+    lat_r = lat_r.mean(axis=1)
+    lon_r = lon.reshape(int(shape2/scale),scale)
+    lon_r = lon_r.mean(axis=1)
 
 
-ds = xr.open_dataset(source2) 
-so2_2 = ds['so2_gchp'].values.T # check variable name
-so2_2 = so2_2/2.69e16 # convert unit
 
+    # Create a figure and set the projection to a global map with the Pacific centered (180 degrees)
+    fig = plt.figure(figsize=(12, 6))
+    ax = plt.axes(projection=ccrs.PlateCarree())
 
-# Plot set up
-regions, extents, fig, gs = plot_setup()
-# Plotting the global map 
-ax_global = fig.add_subplot(gs[0, :], projection=ccrs.PlateCarree())
-plot_map(so2_1, lat, lon,extents, "TROPOMI-DOAS $SO_2$", ax_global)
-ax_global = fig.add_subplot(gs[1, :], projection=ccrs.PlateCarree())
-plot_map(so2_2, lat, lon,extents, "GCHP $SO_2$ ", ax_global)
-ax_global = fig.add_subplot(gs[2, :], projection=ccrs.PlateCarree())
-plot_map(so2_2-so2_1, lat, lon,extents, 'GCHP-TROPOMI', ax_global, diff_cmap=True)
+    # Plot the concentration data using the meshgrid
+    concentration_plot = ax.pcolormesh(lon_r, lat_r, so2_1_r, cmap='RdBu_r', transform=ccrs.PlateCarree(), shading='auto', vmin=300, vmax=500)
 
-plt.suptitle(f"$SO_2$ Maps")
-# save figure
-fname = f"{savedir}map_so2_doas-{qcstr}_vs_{simname}_annual.png"
-savefig(fname, fig)
+    # Add coastlines and features
+    ax.coastlines()
+    ax.add_feature(cfeature.BORDERS, linestyle=':')
+
+    # Add colorbar
+    cax = ax.inset_axes([0.16, 0.15, 0.02, 0.3])  # Adjust these parameters as needed for placement
+    plt.colorbar(concentration_plot, cax=cax, orientation='vertical',label='O3 VCD (DU)')
+        
+    # Set gridlines
+    ax.gridlines(draw_labels=True)
+
+    # Display the plot
+    plt.title(f"$O_3$ Maps")
+
+    # save figure
+    fname = f"{savedir}/map_O3_doas-{qcstr}_coarse{res}_{year}{mn}.png"
+    savefig(fname, fig)
 

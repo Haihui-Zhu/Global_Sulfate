@@ -8,10 +8,10 @@ close all
 
 % ---- Input & Switches --------------
 year = 2021; % year of tropomi data
-SimName  = 'ceds_2021'; % change here
-gchp_dir  = './05.GCHP_outputs/4.ceds_2021'; % change here
-qcstr = 'CF03-SZA60-QA75';
-trpomi_dir = ['./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_' qcstr];
+SimName  = 'htap_2018'; % change here
+gchp_dir  = './05.GCHP_outputs/2.htap_2018'; % change here
+qcstr = 'CF03-SZA50-QA75';
+trpomi_dir = ['/storage1/fs1/rvmartin2/Active/haihuizhu/02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_' qcstr];
 
 
 Mns = 1:12;
@@ -36,8 +36,8 @@ for Mn = Mns
             end
 
             % load gchp so2 lat lon
-%             sim_fname = sprintf('%s/GCHP_SO2_SO4_BC_PM25_%s_%.2d%.2d.nc', gchp_dir, SimName, Mn, Dy);
-            sim_fname = sprintf('%s/GCHP_SO2_SO4_PM25_%s_%.2d%.2d.nc', gchp_dir, SimName, Mn, Dy);
+            sim_fname = sprintf('%s/GCHP_SO2_SO4_BC_PM25_%s_%.2d%.2d.nc', gchp_dir, SimName, Mn, Dy);
+            % sim_fname = sprintf('%s/GCHP_SO2_SO4_PM25_%s_%.2d%.2d.nc', gchp_dir, SimName, Mn, Dy);
             sim_so2 = ncread(sim_fname, 'so2');
 
             if ~exist('sim_lat', 'var')

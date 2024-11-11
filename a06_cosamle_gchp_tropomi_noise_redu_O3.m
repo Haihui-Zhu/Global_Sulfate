@@ -8,11 +8,12 @@ close all
 
 % ---- Input & Switches --------------
 year = 2021; % year of tropomi data
-SimName  = 'edgar_2021'; % change here
-gchp_dir  = './05.GCHP_outputs/5.edgar_2021'; % change here
-qcstr = 'CF005-SZA40-QA75-vza40';
+SimName  = 'ceds_2021'; % change here
+gchp_dir  = './05.GCHP_outputs/4.ceds_2021'; % change here
+qcstr = 'CF03-SZA50-QA75';
 trpomi_dir = ['./02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_' qcstr];
 
+unitconverter = 2.69e16;
 
 Mns = 1:12;
 % ---- End of input ----------------------
@@ -30,12 +31,19 @@ for Mn = Mns
     tic
     for Dy = 1:daysinmonth(Mn)
 
-        tro_fname = sprintf('%s/Tropomi_Regrid_%d%.2d%.2d_%s.nc',trpomi_dir,year,Mn,Dy,qcstr);
+        tro_fname = sprintf('%s/Tropomi_Regrid_%d%.2d%.2d_%s.nc', trpomi_dir, year, Mn, Dy, qcstr);
+        tro_o3_fname = sprintf('%s/Regrid_tropomi_O3_%d%.2d%.2d_%s.nc', trpomi_dir, year, Mn, Dy, qcstr);
         % search if tropomi so2 exists
         if exist(tro_fname, 'file')
 
             % load tropomi so2 lat lon
             tro_so2 = ncread(tro_fname, 'so2');
+            % load tropomi o3
+            if exist(tro_o3_fname, 'file')
+                o3 = ncread(tro_o3_fname,'O3')./unitconverter;
+            else
+                o3 = ones(size(tro_so2));
+            end
 
             if ~exist('tlat', 'var')
                 tlat = ncread(tro_fname, 'lat');
@@ -62,6 +70,7 @@ for Mn = Mns
             % create mask and a mat of N tracking number of days sampled.
             mask = nan(size(tro_so2));
             mask(abs(tro_so2) > 0) = 1;
+            mask(o3>400) == nan;
             % check for any 0:
             ind = find(tro_so2 == 0);
 
@@ -120,7 +129,7 @@ for Mn = Mns
     bg_tro  = mean(bg_tro_out, 2, 'omitnan');
 
     % save monthly data
-    sfname = sprintf('%s/gchp_so2_cosampled_tropomi_%s_noisereduced_%.2d.nc',trpomi_dir,SimName,Mn);
+    sfname = sprintf('%s/gchp_so2_cosampled_tropomi_%s_noisereduced_wO3_%.2d.nc',trpomi_dir,SimName,Mn);
     savenc(sfname, so2_sim, so2_tro, so2_tro_nr, bg_gchp, bg_tro, tlat, tlon)
     fprintf('%s saved\n',sfname)
     
@@ -133,7 +142,7 @@ end
 n=0;
 for Mn = 1:12
     % load monthly data
-    fname = sprintf('%s/gchp_so2_cosampled_tropomi_%s_noisereduced_%.2d.nc',trpomi_dir,SimName,Mn);
+    fname = sprintf('%s/gchp_so2_cosampled_tropomi_%s_noisereduced_wO3_%.2d.nc',trpomi_dir,SimName,Mn);
     if exist(fname, 'file')
         fprintf('%s added\n',fname)
         n = n+1;
@@ -167,7 +176,7 @@ so2_tro = mean(so2_tro, 3, 'omitnan');
 so2_tro_nr = mean(so2_tro_nr, 3, 'omitnan');
 bg_gchp = mean(bg_gchp, 2, 'omitnan');
 bg_tro = mean(bg_tro, 2, 'omitnan');
-sfname = sprintf('%s/gchp_so2_cosampled_tropomi_%s_noisereduced_annual.nc', trpomi_dir, SimName); 
+sfname = sprintf('%s/gchp_so2_cosampled_tropomi_%s_noisereduced_wO3_annual.nc', trpomi_dir, SimName); 
 savenc(sfname, so2_sim, so2_tro, so2_tro_nr, bg_gchp, bg_tro, tlat, tlon)
 fprintf('%s saved\n',sfname)
 

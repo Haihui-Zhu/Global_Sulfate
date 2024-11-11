@@ -1,0 +1,433 @@
+Using default tag: latest
+latest: Pulling from zhuhh3/matlab_env
+Digest: sha256:02b1cfed996382e3cb4773c74fa403479d91985c743f1c15a6c70816404c1599
+Status: Image is up to date for zhuhh3/matlab_env:latest
+docker.io/zhuhh3/matlab_env:latest
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2021 The MathWorks, Inc.
+                  R2021b (9.11.0.1769968) 64-bit (glnxa64)
+                             September 17, 2021
+
+ 
+To get started, type doc.
+For product information, visit www.mathworks.com.
+ 
+[Warning: Column headers from the file were modified to make them valid MATLAB
+identifiers before creating variable names for the table. The original column
+headers are saved in the VariableDescriptions property.
+Set 'VariableNamingRule' to 'preserve' to use the original column headers as
+table variable names.] 
+28-Oct-2024 
+Elapsed time is 2.422060 seconds.
+Elapsed time is 0.934227 seconds.
+Elapsed time is 0.764484 seconds.
+Elapsed time is 0.923950 seconds.
+Elapsed time is 0.760667 seconds.
+Elapsed time is 0.429588 seconds.
+Elapsed time is 0.838779 seconds.
+Elapsed time is 2.552996 seconds.
+Elapsed time is 0.812241 seconds.
+Elapsed time is 0.811127 seconds.
+Elapsed time is 0.763026 seconds.
+Elapsed time is 0.445092 seconds.
+Elapsed time is 0.718608 seconds.
+Elapsed time is 0.783898 seconds.
+Elapsed time is 0.937881 seconds.
+Elapsed time is 0.824902 seconds.
+Elapsed time is 0.893408 seconds.
+Elapsed time is 0.690694 seconds.
+Elapsed time is 0.853657 seconds.
+Elapsed time is 2.074091 seconds.
+Elapsed time is 0.839729 seconds.
+Elapsed time is 0.830851 seconds.
+Elapsed time is 0.842534 seconds.
+Elapsed time is 0.781016 seconds.
+Elapsed time is 0.780330 seconds.
+Elapsed time is 0.814536 seconds.
+Elapsed time is 0.744283 seconds.
+Elapsed time is 0.805603 seconds.
+Elapsed time is 1.111487 seconds.
+Elapsed time is 0.824789 seconds.
+Elapsed time is 0.834790 seconds.
+Elapsed time is 0.055990 seconds.
+Elapsed time is 0.061632 seconds.
+Elapsed time is 0.064760 seconds.
+Elapsed time is 0.062545 seconds.
+Elapsed time is 0.064400 seconds.
+Elapsed time is 0.066460 seconds.
+Elapsed time is 0.050233 seconds.
+Elapsed time is 0.071732 seconds.
+Elapsed time is 0.071965 seconds.
+Elapsed time is 0.065133 seconds.
+Elapsed time is 0.516433 seconds.
+Elapsed time is 0.879343 seconds.
+Elapsed time is 0.870754 seconds.
+Elapsed time is 0.825915 seconds.
+Elapsed time is 0.772603 seconds.
+Elapsed time is 0.780662 seconds.
+Elapsed time is 0.785270 seconds.
+Elapsed time is 0.894976 seconds.
+Elapsed time is 0.785315 seconds.
+Elapsed time is 0.493427 seconds.
+Elapsed time is 0.694167 seconds.
+Elapsed time is 0.829256 seconds.
+Elapsed time is 0.796194 seconds.
+Elapsed time is 0.924220 seconds.
+Elapsed time is 0.468395 seconds.
+Elapsed time is 0.425832 seconds.
+Elapsed time is 0.855368 seconds.
+Elapsed time is 0.446043 seconds.
+Elapsed time is 0.060602 seconds.
+Elapsed time is 0.086375 seconds.
+Elapsed time is 0.074421 seconds.
+Elapsed time is 0.076042 seconds.
+Elapsed time is 0.077647 seconds.
+Elapsed time is 0.060936 seconds.
+Elapsed time is 0.068676 seconds.
+Elapsed time is 0.067768 seconds.
+Elapsed time is 0.065979 seconds.
+Elapsed time is 0.073684 seconds.
+Elapsed time is 0.845856 seconds.
+Elapsed time is 0.490957 seconds.
+Elapsed time is 0.790374 seconds.
+Elapsed time is 0.811303 seconds.
+Elapsed time is 0.478254 seconds.
+Elapsed time is 0.916842 seconds.
+Elapsed time is 0.832392 seconds.
+Elapsed time is 0.480972 seconds.
+Elapsed time is 0.764387 seconds.
+Elapsed time is 0.832791 seconds.
+Elapsed time is 0.795457 seconds.
+Elapsed time is 0.484381 seconds.
+Elapsed time is 0.510572 seconds.
+Elapsed time is 0.690151 seconds.
+Elapsed time is 0.513451 seconds.
+Elapsed time is 0.405267 seconds.
+Elapsed time is 0.876589 seconds.
+Elapsed time is 0.437208 seconds.
+Elapsed time is 0.491253 seconds.
+Elapsed time is 0.979192 seconds.
+Elapsed time is 0.503728 seconds.
+Elapsed time is 0.768626 seconds.
+Elapsed time is 0.841271 seconds.
+Elapsed time is 0.907992 seconds.
+Elapsed time is 0.759192 seconds.
+Elapsed time is 0.752410 seconds.
+Elapsed time is 0.872256 seconds.
+Elapsed time is 0.486714 seconds.
+Elapsed time is 0.847505 seconds.
+Elapsed time is 0.484897 seconds.
+Elapsed time is 0.382511 seconds.
+Elapsed time is 0.896563 seconds.
+Elapsed time is 0.412018 seconds.
+Elapsed time is 0.784218 seconds.
+Elapsed time is 0.813754 seconds.
+Elapsed time is 0.729729 seconds.
+Elapsed time is 0.942405 seconds.
+Elapsed time is 0.931685 seconds.
+Elapsed time is 0.856003 seconds.
+Elapsed time is 0.829501 seconds.
+Elapsed time is 0.923391 seconds.
+Elapsed time is 0.886818 seconds.
+Elapsed time is 0.837996 seconds.
+Elapsed time is 1.217772 seconds.
+Elapsed time is 0.808344 seconds.
+Elapsed time is 0.819116 seconds.
+Elapsed time is 0.786972 seconds.
+Elapsed time is 0.886415 seconds.
+Elapsed time is 0.782066 seconds.
+Elapsed time is 0.871883 seconds.
+Elapsed time is 0.845581 seconds.
+Elapsed time is 0.788187 seconds.
+Elapsed time is 0.855248 seconds.
+Elapsed time is 1.219783 seconds.
+Elapsed time is 0.818746 seconds.
+Elapsed time is 0.920314 seconds.
+Elapsed time is 0.799119 seconds.
+Elapsed time is 0.909141 seconds.
+Elapsed time is 0.835938 seconds.
+Elapsed time is 0.854507 seconds.
+Elapsed time is 0.778902 seconds.
+Elapsed time is 0.915593 seconds.
+Elapsed time is 0.827369 seconds.
+Elapsed time is 0.866485 seconds.
+Elapsed time is 0.933263 seconds.
+Elapsed time is 0.827732 seconds.
+Elapsed time is 0.499375 seconds.
+Elapsed time is 0.858172 seconds.
+Elapsed time is 0.767267 seconds.
+Elapsed time is 0.827666 seconds.
+Elapsed time is 0.421118 seconds.
+Elapsed time is 0.806554 seconds.
+Elapsed time is 0.448423 seconds.
+Elapsed time is 0.432569 seconds.
+Elapsed time is 0.818645 seconds.
+Elapsed time is 0.856118 seconds.
+Elapsed time is 0.835693 seconds.
+Elapsed time is 0.856351 seconds.
+Elapsed time is 0.810064 seconds.
+Elapsed time is 0.836887 seconds.
+Elapsed time is 0.863427 seconds.
+Elapsed time is 0.514509 seconds.
+Elapsed time is 0.807397 seconds.
+Elapsed time is 0.915211 seconds.
+Elapsed time is 0.779293 seconds.
+Elapsed time is 0.853825 seconds.
+Elapsed time is 0.757868 seconds.
+Elapsed time is 0.893553 seconds.
+Elapsed time is 0.929991 seconds.
+Elapsed time is 0.440481 seconds.
+Elapsed time is 0.730935 seconds.
+Elapsed time is 0.487733 seconds.
+Elapsed time is 0.778122 seconds.
+Elapsed time is 0.847938 seconds.
+Elapsed time is 0.449513 seconds.
+Elapsed time is 0.833427 seconds.
+Elapsed time is 0.853487 seconds.
+Elapsed time is 0.741952 seconds.
+Elapsed time is 0.885022 seconds.
+Elapsed time is 0.852615 seconds.
+Elapsed time is 0.816186 seconds.
+Elapsed time is 0.804685 seconds.
+Elapsed time is 0.801705 seconds.
+Elapsed time is 0.884943 seconds.
+Elapsed time is 0.823806 seconds.
+Elapsed time is 0.803493 seconds.
+Elapsed time is 0.890036 seconds.
+Elapsed time is 0.403200 seconds.
+Elapsed time is 0.773491 seconds.
+Elapsed time is 0.792374 seconds.
+Elapsed time is 0.450753 seconds.
+Elapsed time is 0.399477 seconds.
+Elapsed time is 0.867380 seconds.
+Elapsed time is 0.875493 seconds.
+Elapsed time is 0.777802 seconds.
+Elapsed time is 1.128354 seconds.
+Elapsed time is 1.198418 seconds.
+Elapsed time is 0.804978 seconds.
+Elapsed time is 1.178390 seconds.
+Elapsed time is 0.865859 seconds.
+Elapsed time is 1.225585 seconds.
+Elapsed time is 0.799770 seconds.
+Elapsed time is 0.817169 seconds.
+Elapsed time is 0.830416 seconds.
+Elapsed time is 0.783071 seconds.
+Elapsed time is 0.906533 seconds.
+Elapsed time is 0.719940 seconds.
+Elapsed time is 1.243748 seconds.
+Elapsed time is 0.679204 seconds.
+Elapsed time is 0.824560 seconds.
+Elapsed time is 0.932930 seconds.
+Elapsed time is 0.763691 seconds.
+Elapsed time is 0.453360 seconds.
+Elapsed time is 0.830501 seconds.
+Elapsed time is 0.797506 seconds.
+Elapsed time is 1.207545 seconds.
+Elapsed time is 0.784698 seconds.
+Elapsed time is 1.154635 seconds.
+Elapsed time is 1.150576 seconds.
+Elapsed time is 1.573019 seconds.
+Elapsed time is 0.816174 seconds.
+Elapsed time is 0.802525 seconds.
+Elapsed time is 0.734251 seconds.
+Elapsed time is 1.262658 seconds.
+Elapsed time is 0.792405 seconds.
+Elapsed time is 1.609007 seconds.
+Elapsed time is 1.169154 seconds.
+Elapsed time is 1.987478 seconds.
+Elapsed time is 1.156593 seconds.
+Elapsed time is 1.204307 seconds.
+Elapsed time is 3.047819 seconds.
+Elapsed time is 0.819519 seconds.
+Elapsed time is 1.144511 seconds.
+Elapsed time is 0.945712 seconds.
+Elapsed time is 1.064469 seconds.
+Elapsed time is 0.791321 seconds.
+Elapsed time is 0.875488 seconds.
+Elapsed time is 2.408793 seconds.
+Elapsed time is 1.960959 seconds.
+Elapsed time is 2.390648 seconds.
+Elapsed time is 0.730809 seconds.
+Elapsed time is 1.595686 seconds.
+Elapsed time is 2.386225 seconds.
+Elapsed time is 1.850172 seconds.
+Elapsed time is 1.873031 seconds.
+Elapsed time is 0.811580 seconds.
+Elapsed time is 2.280421 seconds.
+Elapsed time is 1.483572 seconds.
+Elapsed time is 1.590898 seconds.
+Elapsed time is 2.667440 seconds.
+Elapsed time is 0.876869 seconds.
+Elapsed time is 1.898389 seconds.
+Elapsed time is 2.690161 seconds.
+Elapsed time is 1.215013 seconds.
+Elapsed time is 1.527285 seconds.
+Elapsed time is 1.592580 seconds.
+Elapsed time is 1.172352 seconds.
+Elapsed time is 0.786027 seconds.
+Elapsed time is 0.790617 seconds.
+Elapsed time is 1.959713 seconds.
+Elapsed time is 1.665099 seconds.
+Elapsed time is 1.209002 seconds.
+Elapsed time is 1.912410 seconds.
+Elapsed time is 0.791945 seconds.
+Elapsed time is 1.990621 seconds.
+Elapsed time is 1.606920 seconds.
+Elapsed time is 1.060684 seconds.
+Elapsed time is 0.855672 seconds.
+Elapsed time is 2.249602 seconds.
+Elapsed time is 0.839158 seconds.
+Elapsed time is 0.809762 seconds.
+Elapsed time is 1.599991 seconds.
+Elapsed time is 1.199420 seconds.
+Elapsed time is 1.261687 seconds.
+Elapsed time is 1.159851 seconds.
+Elapsed time is 0.831522 seconds.
+Elapsed time is 1.161636 seconds.
+Elapsed time is 1.140090 seconds.
+Elapsed time is 1.183218 seconds.
+Elapsed time is 0.790911 seconds.
+Elapsed time is 1.573904 seconds.
+Elapsed time is 0.790332 seconds.
+Elapsed time is 1.160766 seconds.
+Elapsed time is 2.613348 seconds.
+Elapsed time is 1.202674 seconds.
+Elapsed time is 1.129138 seconds.
+Elapsed time is 0.807448 seconds.
+Elapsed time is 1.261266 seconds.
+Elapsed time is 1.177809 seconds.
+Elapsed time is 1.879322 seconds.
+Elapsed time is 0.833340 seconds.
+Elapsed time is 1.154865 seconds.
+Elapsed time is 3.018110 seconds.
+Elapsed time is 0.757449 seconds.
+Elapsed time is 1.540541 seconds.
+Elapsed time is 1.221204 seconds.
+Elapsed time is 0.712332 seconds.
+Elapsed time is 0.854557 seconds.
+Elapsed time is 0.892098 seconds.
+Elapsed time is 0.796576 seconds.
+Elapsed time is 0.809115 seconds.
+Elapsed time is 1.630634 seconds.
+Elapsed time is 1.152603 seconds.
+Elapsed time is 1.539172 seconds.
+Elapsed time is 2.051473 seconds.
+Elapsed time is 1.583187 seconds.
+Elapsed time is 0.824304 seconds.
+Elapsed time is 2.026786 seconds.
+Elapsed time is 1.234060 seconds.
+Elapsed time is 1.624770 seconds.
+Elapsed time is 1.264668 seconds.
+Elapsed time is 1.304520 seconds.
+Elapsed time is 0.409223 seconds.
+Elapsed time is 1.224116 seconds.
+Elapsed time is 0.853972 seconds.
+Elapsed time is 1.679243 seconds.
+Elapsed time is 1.608927 seconds.
+Elapsed time is 0.860694 seconds.
+Elapsed time is 1.196670 seconds.
+Elapsed time is 1.632213 seconds.
+Elapsed time is 1.656560 seconds.
+Elapsed time is 1.306909 seconds.
+Elapsed time is 1.103491 seconds.
+Elapsed time is 2.802324 seconds.
+Elapsed time is 0.753877 seconds.
+Elapsed time is 1.209730 seconds.
+Elapsed time is 1.299126 seconds.
+Elapsed time is 0.825800 seconds.
+Elapsed time is 0.858122 seconds.
+Elapsed time is 0.870212 seconds.
+Elapsed time is 1.616911 seconds.
+Elapsed time is 0.864219 seconds.
+Elapsed time is 2.422851 seconds.
+Elapsed time is 0.851704 seconds.
+Elapsed time is 1.204069 seconds.
+Elapsed time is 2.003491 seconds.
+Elapsed time is 1.259173 seconds.
+Elapsed time is 1.239621 seconds.
+Elapsed time is 1.312386 seconds.
+Elapsed time is 0.743791 seconds.
+Elapsed time is 1.307433 seconds.
+Elapsed time is 0.814634 seconds.
+Elapsed time is 1.255716 seconds.
+Elapsed time is 0.808931 seconds.
+Elapsed time is 0.840266 seconds.
+Elapsed time is 2.028637 seconds.
+Elapsed time is 1.256565 seconds.
+Elapsed time is 1.640297 seconds.
+Elapsed time is 0.831295 seconds.
+Elapsed time is 2.465343 seconds.
+Elapsed time is 0.801768 seconds.
+Elapsed time is 1.232638 seconds.
+Elapsed time is 1.230662 seconds.
+Elapsed time is 3.577620 seconds.
+Elapsed time is 1.747110 seconds.
+Elapsed time is 1.162765 seconds.
+Elapsed time is 0.872330 seconds.
+Elapsed time is 1.201309 seconds.
+Elapsed time is 2.117363 seconds.
+Elapsed time is 1.165062 seconds.
+Elapsed time is 1.232440 seconds.
+Elapsed time is 1.990937 seconds.
+Elapsed time is 2.085737 seconds.
+Elapsed time is 1.550256 seconds.
+Elapsed time is 2.072999 seconds.
+Elapsed time is 2.021052 seconds.
+Elapsed time is 1.301432 seconds.
+Elapsed time is 0.814855 seconds.
+Elapsed time is 0.807188 seconds.
+Elapsed time is 0.845943 seconds.
+Elapsed time is 1.618507 seconds.
+Elapsed time is 1.710373 seconds.
+Elapsed time is 2.455069 seconds.
+Elapsed time is 0.847678 seconds.
+Elapsed time is 0.788431 seconds.
+Elapsed time is 0.924986 seconds.
+Done reading Sim from ceds.
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@compute1-exec-14.ris.wustl.edu>
+Subject: Job 872639: <gchp_at_spt> in cluster <compute1-lsf> Done
+
+Job <gchp_at_spt> was submitted from host <compute1-client-1.ris.wustl.edu> by user <haihuizhu> in cluster <compute1-lsf> at Mon Oct 28 16:05:15 2024
+Job was executed on host(s) <8*compute1-exec-14.ris.wustl.edu>, in queue <rvmartin>, as user <haihuizhu> in cluster <compute1-lsf> at Mon Oct 28 16:05:17 2024
+</home/haihui> was used as the home directory.
+</home/haihui/my-projects/4.SPARTAN_SO4> was used as the working directory.
+Started at Mon Oct 28 16:05:17 2024
+Terminated at Mon Oct 28 16:12:13 2024
+Results reported at Mon Oct 28 16:12:13 2024
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#BSUB -n 8
+#BSUB -R "rusage[mem=64G] span[hosts=1] select[mem < 500GB] order[-slots]"
+#BSUB -q rvmartin
+#BSUB -a 'docker(zhuhh3/matlab_env)'
+#BSUB -o job-matlab-%J.txt
+#BSUB -J "gchp_at_spt"
+
+cd /storage1/fs1/rvmartin/Active/haihuizhu/4.SPARTAN_SO4
+matlab -nodisplay -r "a02_compile_spartan_aeronet_gchp; exit"
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   60.15 sec.
+    Max Memory :                                 1125 MB
+    Average Memory :                             1069.65 MB
+    Total Requested Memory :                     65536.00 MB
+    Delta Memory :                               64411.00 MB
+    Max Swap :                                   1111 MB
+    Max Processes :                              8
+    Max Threads :                                22
+    Run time :                                   417 sec.
+    Turnaround time :                            418 sec.
+
+The output (if any) is above this job summary.
+

@@ -12,13 +12,13 @@ addpath(sprintf('%s/haihuizhu/1.code',RootDir))
 addpath(sprintf('%s/haihuizhu/4.SPARTAN_SO4/functions',RootDir))
 SaveDir = sfmkdir(sprintf('%s/haihuizhu/4.SPARTAN_SO4/06.spartan_gchp/',RootDir)); % save to compute1
 
-masterfname = sprintf('pm25_so4_202407'); % file name to save
+masterfname = sprintf('pm25_so4_202410'); % file name to save
 
-target_sim = {'ceds-2018', 'edgar-2018', 'htap-2018'};
+target_sim = {'ceds-2021', 'edgar-2021', 'htap-2018'};
 
 ObsYear = 2019:2023; % years that spartan data can be included (WashU)
-simyear = 2018;
-SimName = 'ceds' ;
+simyear = 2021;
+SimName = 'ceds';
 Species = {'SO4',  'NO3',  'NH4',   'OM', 'BC',  'dust', 'SS'};
 
 % calculate monthly mean: both SPT and AERONET exist at the same day for at
@@ -87,7 +87,12 @@ for tg = 1:length(target_sim)
     load(sprintf('%s/SIM_%s_%s.mat',SaveDir,masterfname,target_sim{tg}),'so4_sim','pm25_sim')
 
     % ==== before filter data for dates/species, repeat SIM for other years ===
-    rowsimyear = find(ismember(D1_Dates(:, 1), simyear)); % select one year of data to plot
+    if contains(target_sim{tg}, '2018')
+        rowsimyear = find(ismember(D1_Dates(:, 1), 2018)); % select one year of data to plot
+    else
+        rowsimyear = find(ismember(D1_Dates(:, 1), simyear)); % select one year of data to plot
+    end
+
     for yr = ObsYear
         trow = find(ismember(D1_Dates(:, 1), yr));
         if length(trow) == 366
@@ -149,26 +154,21 @@ end
 
 %% making the time series plots
 
-for rgn = 1:numofrg
+% SO2
+spec = 'SO4';
+make_timeseries(meanmnso2,prc25so2,prc75so2,region_name,existrg, site_label_so4, target_sim,spec,SaveDir)
+sfname = sprintf('%s/gchp_vs_spartan_%s_byregion.mat', SaveDir,spec);
+save(sfname, 'meanmnso2','prc25so2', 'prc75so2', 'region_name', 'existrg','site_label_so4','target_sim')
 
-    % SO2
-    tsites = site_label_so4{rgn};
-    meandata = meanmnso2(:,:,rgn);
-    prc25 = prc25so2(:,:,rgn);
-    prc75 = prc75so2(:,:,rgn);
-    make_timeseries(meandata,prc25,prc75,region_name{existrg(rgn)}, tsites, target_sim,'SO4',SaveDir)
+% PM2.5
+spec = 'PM2.5';
+make_timeseries(meanmnpm,prc25pm,prc75pm,region_name,existrg, site_label_pm, target_sim,spec,SaveDir)
+sfname = sprintf('%s/gchp_vs_spartan_%s_byregion.mat', SaveDir, spec);
+save(sfname, 'meanmnpm', 'prc25pm', 'prc75pm', 'region_name', 'existrg', 'site_label_pm', 'target_sim')
 
-    % PM2.5
-    tsites = site_label_pm{rgn};
-    meandata = meanmnpm(:,:,rgn);
-    prc25 = prc25pm(:,:,rgn);
-    prc75 = prc75pm(:,:,rgn);
-    make_timeseries(meandata,prc25,prc75,region_name{existrg(rgn)}, tsites, target_sim,'PM2.5',SaveDir)
-
-end
 
 %% FUNCTIONS
-function make_timeseries(meandata,prc25,prc75,region_name, sitelabel, target_sim,spec, SaveDir)
+function make_timeseries(meanmnall,prc25all,prc75all,region_name, existrg, site_label_so4, target_sim, spec, SaveDir)
 Color =[0 0 0;
     0.6350 0.0780 0.1840;
     0.9290 0.6940 0.1250;
@@ -179,120 +179,152 @@ lw = 1.2; % line width
 fal = 0.25; % confidence face alpha
 legends = [];
 
-figure
-for sid = size(meandata,2):-1:1 % loop through simulations/measurement
-    tmean = meandata(:,sid);
-    tprc25 = prc25(:,sid);
-    tprc75 = prc75(:,sid);
-    % to deal with missing data (part 1: using mean for missing data)
-    nanind = find(isnan(tprc25));
-    if ~isempty(nanind)
-        for i = 1:length(nanind)
-            if nanind(i) == 1
-                tprc25(1) = tprc25(2);
-                tprc75(1) = tprc75(2);
-            elseif  nanind(i) == 12
-                tprc25(12) = tprc25(11);
-                tprc75(12) = tprc75(11);
-            else
-                n = 0;
-                while nanind(i)-n >=1 && isnan(tprc25(nanind(i)-n))
-                    n = n+1;
-                end
-                m = 0;
-                while nanind(i)+m <=12 && isnan(tprc25(nanind(i)+m)) 
-                    m = m+1;
-                end
-                if nanind(i)-n == 0 && nanind(i)+m < 13% no lower end
-                    tprc25(nanind(i)) = tprc25(nanind(i)+m);
-                    tprc75(nanind(i)) = tprc75(nanind(i)+m);
-                    tmean(nanind(i))  = tmean(nanind(i)+m);
-                elseif  nanind(i)+m == 13 && nanind(i)-n > 0% no upper end
-                    tprc25(nanind(i)) = tprc25(nanind(i)-n);
-                    tprc75(nanind(i)) = tprc75(nanind(i)-n);
-                    tmean(nanind(i))  = tmean(nanind(i)-n);
+c1 = 0.05; c2 = 0.35; c3 = 0.65;
+l1 = 0.65;
+l2 = 0.35;
+l3 = 0.05;
+fw = 0.27;
+fh = 0.25;
+% the order is strange because we want to show ME as first and other GS in the first 6, and GN at the end
+positions =[c2,l1, fw,fh; % AF
+            c3, l1, fw, fh; % CAm
+            c2, l3, fw, fh; % NAm
+            c1, l3, fw, fh; % As P
+            c1, l2, fw, fh; % As E
+            c2, l2, fw, fh; % As S
+            c3, l2, fw, fh; % As SE
+            c3, l3, fw, fh; % Au
+            c1, l1, fw, fh; ]; % ME
+
+figure('Position',[0, 0, 1200, 1200])
+
+for rgn = 1:length(existrg)
+    sitelabel = site_label_so4{rgn};
+    meandata = meanmnall(:,:,rgn);
+    prc25 = prc25all(:,:,rgn);
+    prc75 = prc75all(:,:,rgn);
+
+    subplot('Position',positions(rgn,:))
+
+    for sid = size(meandata,2):-1:1 % loop through simulations/measurement
+        tmean = meandata(:,sid);
+        tprc25 = prc25(:,sid);
+        tprc75 = prc75(:,sid);
+        % to deal with missing data (part 1: using mean for missing data)
+        nanind = find(isnan(tprc25));
+        if ~isempty(nanind)
+            for i = 1:length(nanind)
+                if nanind(i) == 1
+                    tprc25(1) = tprc25(2);
+                    tprc75(1) = tprc75(2);
+                elseif  nanind(i) == 12
+                    tprc25(12) = tprc25(11);
+                    tprc75(12) = tprc75(11);
                 else
-                    tprc25(nanind(i)) = 0.5*(tprc25(nanind(i)-n) + tprc25(nanind(i)+m));
-                    tprc75(nanind(i)) = 0.5*(tprc75(nanind(i)-n) + tprc75(nanind(i)+m));
-                    tmean(nanind(i)) = 0.5*(tmean(nanind(i)-n) + tmean(nanind(i)+m));
+                    n = 0;
+                    while nanind(i)-n >=1 && isnan(tprc25(nanind(i)-n))
+                        n = n+1;
+                    end
+                    m = 0;
+                    while nanind(i)+m <=12 && isnan(tprc25(nanind(i)+m))
+                        m = m+1;
+                    end
+                    if nanind(i)-n == 0 && nanind(i)+m < 13% no lower end
+                        tprc25(nanind(i)) = tprc25(nanind(i)+m);
+                        tprc75(nanind(i)) = tprc75(nanind(i)+m);
+                        tmean(nanind(i))  = tmean(nanind(i)+m);
+                    elseif  nanind(i)+m == 13 && nanind(i)-n > 0% no upper end
+                        tprc25(nanind(i)) = tprc25(nanind(i)-n);
+                        tprc75(nanind(i)) = tprc75(nanind(i)-n);
+                        tmean(nanind(i))  = tmean(nanind(i)-n);
+                    else
+                        tprc25(nanind(i)) = 0.5*(tprc25(nanind(i)-n) + tprc25(nanind(i)+m));
+                        tprc75(nanind(i)) = 0.5*(tprc75(nanind(i)-n) + tprc75(nanind(i)+m));
+                        tmean(nanind(i)) = 0.5*(tmean(nanind(i)-n) + tmean(nanind(i)+m));
+                    end
                 end
-            end            
-        end
-    end
-
-
-    % ================= Plot Begins ===========================
-    
-    % adding shadow
-    xconf = [1:12 12:-1:1] ;
-    yconfsim = [tprc75' tprc25(end:-1:1)'];
-    p = fill(xconf,yconfsim(1,:),Color(sid,:),'FaceAlpha',fal);
-    p.EdgeColor = 'none';
-    hold on
-
-    % adding the center line
-    if sid ==1
-        legends(sid) = plot(1:12,tmean(1:12),lines{sid},'Color',Color(sid,:),'LineWidth',lw,'DisplayName','Measurement');
-    else
-        legends(sid) = plot(1:12, tmean(1:12), lines{sid}, 'Color', Color(sid, :), 'LineWidth', lw, 'DisplayName', target_sim{sid - 1});
-    end
-    hold on
-
-    % to deal with missing data (part 2: using white mask)
-    mu = max(tprc75); % top of the mask
-    md = min(tprc25); % bottom of the mask
-    if ~isempty(nanind)
-        for ii = 1:length(nanind)
-            sind = nanind(ii)-0.5;
-            eind = nanind(ii)+0.5;
-            if sind<0
-                sind = 0;
             end
-            if eind>12
-                eind =12;
-            end
-
-            xconf =    [       sind:0.5:eind        eind:-0.5:sind] ;
-            yconfsim = [repmat(mu,[1,length(xconf)/2])  repmat(md,[1,length(xconf)/2]) ];
-
-            p = fill(xconf,yconfsim(1,:),[1,1,1]); % white mask
-            p.EdgeColor = 'none';
         end
-        clear nanind
-    end
-    hold on
 
-    % add y axis label
-    switch spec
-        case 'PM2.5'
-            ylabel(sprintf('%s (%s)','PM_{2.5}','\mug/m^{3}'));
-        case 'SO4'
-            ylabel(sprintf('%s (%s)','Sulfate','\mug/m^{3}'));
+
+        % ================= Plot Begins ===========================
+
+        % adding shadow
+        xconf = [1:12 12:-1:1] ;
+        yconfsim = [tprc75' tprc25(end:-1:1)'];
+        p = fill(xconf,yconfsim(1,:),Color(sid,:),'FaceAlpha',fal);
+        p.EdgeColor = 'none';
+        hold on
+
+        % adding the center line
+        if sid ==1
+            legends(sid) = plot(1:12,tmean(1:12),lines{sid},'Color',Color(sid,:),'LineWidth',lw,'DisplayName','Measurement');
+        else
+            legends(sid) = plot(1:12, tmean(1:12), lines{sid}, 'Color', Color(sid, :), 'LineWidth', lw, 'DisplayName', target_sim{sid - 1});
+        end
+        hold on
+
+        % to deal with missing data (part 2: using white mask)
+        mu = max(tprc75); % top of the mask
+        md = min(tprc25); % bottom of the mask
+        if ~isempty(nanind)
+            for ii = 1:length(nanind)
+                sind = nanind(ii)-0.5;
+                eind = nanind(ii)+0.5;
+                if sind<0
+                    sind = 0;
+                end
+                if eind>12
+                    eind =12;
+                end
+
+                xconf =    [       sind:0.5:eind        eind:-0.5:sind] ;
+                yconfsim = [repmat(mu,[1,length(xconf)/2])  repmat(md,[1,length(xconf)/2]) ];
+
+                p = fill(xconf,yconfsim(1,:),[1,1,1]); % white mask
+                p.EdgeColor = 'none';
+            end
+            clear nanind
+        end
+        hold on
+
+        % add y axis label
+        if rgn == 9 || rgn == 4 || rgn == 5 % strange location since plots are placed in a strange order (see 'positions')
+            switch spec
+                case 'PM2.5'
+                    ylabel(sprintf('%s (%s)','PM_{2.5}','\mug/m^{3}'));
+                case 'SO4'
+                    ylabel(sprintf('%s (%s)','Sulfate','\mug/m^{3}'));
+            end
+            hold on
+        end
+
     end
-    hold on
+
+    title(region_name{existrg(rgn)})
+    xticks(1:12)
+    xticklabels({'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'})
+    xlim([1 12])
+    xtickangle(45)
+    set(gca ,'FontName', 'Arial', 'FontSize',fz);
+    if rgn == 1
+        legend(legends,'location','northeast')
+    end
+
+    % adding site label
+    % sitelabel = '';
+    % for nn = 1:length(tsites)
+    %     sitelabel =  sprintf('%s\n%s',sitelabel,tsites{nn});
+    % end
+    text(0.05,1,sitelabel,'Units','normalized','VerticalAlignment','top','fontSize',fz+2)
+
 
 end
-
-title(region_name)
-xticks(1:12)
-xticklabels({'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'})
-xlim([1 12])
-xtickangle(45)
-set(gca ,'FontName', 'Arial', 'FontSize',fz);
-legend(legends,'location','northeast')
-
-% adding site label
-% sitelabel = '';
-% for nn = 1:length(tsites)
-%     sitelabel =  sprintf('%s\n%s',sitelabel,tsites{nn});
-% end
-text(0.05,1,sitelabel,'Units','normalized','VerticalAlignment','top','fontSize',fz+2)
-
 % save figure
-fname = sprintf('%s/TimeSeries_Region_%s_%s.png',SaveDir,region_name,spec);
+fname = sprintf('%s/TimeSeries_Region_%s.png',SaveDir,spec);
 saveas(gcf,fname)
 fprintf('%s saved\n',fname)
 
-close 
+close
 
 end

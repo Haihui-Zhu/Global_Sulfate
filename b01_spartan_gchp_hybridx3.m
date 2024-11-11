@@ -12,16 +12,16 @@ addpath(sprintf('%s/haihuizhu/1.code',RootDir))
 addpath(sprintf('%s/haihuizhu/4.SPARTAN_SO4/functions',RootDir))
 SaveDir = sfmkdir(sprintf('%s/haihuizhu/4.SPARTAN_SO4/06.spartan_gchp/',RootDir)); % save to compute1
 
-masterfname = sprintf('pm25_so4_202407'); % file name to save
+masterfname = sprintf('pm25_so4_202410'); % file name to save
 
-S_fig_statis = 0; % run to get hybridx3 figure and the statistics
-S_bar = 1; % run to get bar including multiple sims
+S_fig_statis = 1; % run to get hybridx3 figure and the statistics
+S_bar = 0; % run to get bar including multiple sims
     % if s_bar is true:
-    target_sim = {'ceds_2021', 'edgar_2018', 'htap_2018'};
+    target_sim = {'ceds_2021', 'edgar_2021', 'htap_2018'};
 
 ObsYear = 2019:2023; % years that spartan data can be included (WashU)
 simyear = 2018;
-SimName = 'edgar' ; 
+SimName = 'htap' ; 
 SimDir = get_sim_dir(SimName, simyear,RootDir);
 Species = {'SO4',  'NO3',  'NH4',   'OM', 'BC',  'dust', 'SS'}; 
 
