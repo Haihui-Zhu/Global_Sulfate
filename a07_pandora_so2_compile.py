@@ -9,8 +9,8 @@ from datetime import timedelta
 # Step 0: Define paths and func:
 # indir = '/Volumes/rvmartin/Active/Shared/haihuizhu/SO2_Pandora/'
 indir = '/storage1/fs1/rvmartin/Active/Shared/haihuizhu/SO2_Pandora/'
-outfilename1 = f'{indir}/compiled_pandora_so2_2021_s5popt.json'
-outfilename2 = f'{indir}/compiled_pandora_so2_2021_24hr.json'
+outfilename1 = f'{indir}/compiled_pandora_so2_2020-2024_s5popt_aq01-21.json'
+outfilename2 = f'{indir}/compiled_pandora_so2_2020-2024_24hr_aq01-21.json'
 
 def find_start_index(file_path):
     dash_count = 0
@@ -110,7 +110,7 @@ data2 = {site: {var: [] for var in dic_name} for site in site_name}
 # - find time zone
 # - [otptional] find data for S5P overpass time
 # - quatlity checks:
-#   - L2qa < 2
+#   - L2qa == 1, 2, 11, 12, 21, 22,
 #   - for qualified points, using duration weighted mean for each day. 
 # - assign all site info and daily data
 for sid, site in enumerate(site_name):
@@ -135,14 +135,14 @@ for sid, site in enumerate(site_name):
     data_temp[0] = data_temp[0].apply(lambda x: convert_to_local_solar_time(x, data1[site]['lon']))
 
     # ====== [optional 1] find data within S5P overpass time (13:30) =======
-    mask =  (data_temp[0].dt.hour == 13) & (data_temp[0].dt.year == 2021) # 
+    mask =  (data_temp[0].dt.hour == 13) & (data_temp[0].dt.year >= 2020)  & (data_temp[0].dt.year <= 2022)# 
     data_temp_1 = data_temp[mask]
     
     # quality checks
     for i, item in enumerate(column_info):
         if item == 'L2 data quality flag for sulfur dioxide':
             tcol = column_num[i]
-            mask = data_temp_1[tcol]< 2
+            mask = (data_temp_1[tcol]%10) < 1
             data_temp_1 = data_temp_1[mask]
 
     # duration weighted daily mean
@@ -163,14 +163,15 @@ for sid, site in enumerate(site_name):
 
 
     # ====== [optional 2] calculate 24 hr mean data ============================
-    mask = (data_temp[0].dt.year == 2021) 
+    mask = (data_temp[0].dt.year >= 2020) & (data_temp[0].dt.year <= 2022)
     data_temp_2 = data_temp[mask]
+    # data_temp_2 = data_temp
     
     # quality checks
     for i, item in enumerate(column_info):
         if item == 'L2 data quality flag for sulfur dioxide':
             tcol = column_num[i]
-            mask = data_temp_2[tcol]< 2
+            mask = (data_temp_2[tcol]%10) < 1
             data_temp_2 = data_temp_2[mask]
 
     # duration weighted daily mean

@@ -4,6 +4,11 @@ import json
 import xarray as xr
 import numpy as np
 from scipy.interpolate import griddata
+# import not installed utils
+import sys
+sys.path.append('functions/')
+from spatial_smoothing import spatial_smoothing
+
 
 def interp_site(latd,lond,doas,site_info):
     # interpolate
@@ -13,33 +18,16 @@ def interp_site(latd,lond,doas,site_info):
     doas_intp = griddata(points, values, (site_info['lon'],site_info['lat']), method='nearest')
     return doas_intp
 
-def spatial_smoothing(mapdata,lat,lon,resout,resin):
-
-    scale = int(resout/resin)
-    shape1 = len(lat)
-    shape2 = len(lon)
-
-    so2_1_r = mapdata.reshape(int(shape1/scale),scale,int(shape2/scale),scale)
-    so2_1_r = so2_1_r.mean(axis=(1, 3))
-
-    lat_r = lat.reshape(int(shape1/scale),scale)
-    lat_r = lat_r.mean(axis=1)
-    lon_r = lon.reshape(int(shape2/scale),scale)
-    lon_r = lon_r.mean(axis=1)
-
-    # # mask out negative values
-    # neg_mask = so2_1_r <0
-    # so2_1_r[neg_mask] = 0
-
-    return so2_1_r, lat_r, lon_r
 
 
 
 indir = '/storage1/fs1/rvmartin/Active/Shared/haihuizhu/SO2_Pandora/'
-infname1 = f'{indir}/compiled_pandora_so2_2021_s5popt.json'
-outfname1 = f'{indir}/compiled_pandora_so2_2021_s5popt_with_trop_gchp.json'
-infname2 = f'{indir}/compiled_pandora_so2_2021_24hr.json'
-outfname2 = f'{indir}/compiled_pandora_so2_2021_24hr_with_trop_gchp.json'
+qa = 'aq01-21'
+ystr = '2020-2024'
+infname1 = f'{indir}/compiled_pandora_so2_{ystr}_s5popt_{qa}.json'
+outfname1 = f'{indir}/compiled_pandora_so2_{ystr}_s5popt_{qa}_with_cobra-d_gchp-d.json'
+infname2 = f'{indir}/compiled_pandora_so2_{ystr}_24hr_{qa}.json'
+outfname2 = f'{indir}/compiled_pandora_so2_{ystr}_24hr_{qa}_with_cobra-d_gchp-d.json'
 
 # step 1: read pandora data
 with open(infname1, 'r') as file:
@@ -66,70 +54,110 @@ simname = 'ceds_2021'
 
 
 for sid, site in enumerate(site_info['site']):
-    data1[site]['tropomi-doas'] = [None]*len(data1[site]['date'])
+    # data1[site]['tropomi-doas'] = [None]*len(data1[site]['date'])
     data1[site]['tropomi-cobra'] = [None]*len(data1[site]['date'])
     data1[site]['gchp-ceds'] = [None]*len(data1[site]['date'])
+    data1[site]['gchp-edgar'] = [None]*len(data1[site]['date'])
+    data1[site]['gchp-htap'] = [None]*len(data1[site]['date'])
 
-    data2[site]['tropomi-doas'] = [None]*len(data2[site]['date'])
+
+    # data2[site]['tropomi-doas'] = [None]*len(data2[site]['date'])
     data2[site]['tropomi-cobra'] = [None]*len(data2[site]['date'])
     data2[site]['gchp-ceds'] = [None]*len(data2[site]['date'])
+    data2[site]['gchp-edgar'] = [None]*len(data2[site]['date'])
+    data2[site]['gchp-htap'] = [None]*len(data2[site]['date'])
 
 
 for mn in range(1,13):
     print(f'process mn-{mn}')
-    cobrafname = f'/storage1/fs1/rvmartin2/Active/haihuizhu/02.TROPOMI_SO2_Ref/COBRA/compiled/gchp_so2_cosampled_tropomi_ceds_2019_{mn:02d}.nc' # use monthly mean so far
-    # read doas:
-    ds = xr.open_dataset(cobrafname) 
-    cobra = ds['so2_pbl'].values.T # check variable name
-    cobra = cobra/2.69e16 # convert unit  
-    latc = ds['latitude'].values # presumably all sources share the same lat lon
-    lonc = ds['longitude'].values
-    # spatial smoothing
-    cobra, latc, lonc = spatial_smoothing(cobra,latc,lonc,0.4,0.05)
-    # interpolate:
-    cobra = interp_site(latc,lonc,cobra,site_info)
+
+    # doasfname = f'/storage1/fs1/rvmartin2/Active/haihuizhu/02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_{qcstr}/gchp_so2_cosampled_tropomi_ceds_{yr}_noisereduced_{mn:02d}.nc'
+    # # read doas:
+    # ds = xr.open_dataset(doasfname) 
+    # doas = ds['so2_tro'].values.T # check variable name
+    # doas = doas/2.69e16 # convert unit
+    # latd = ds['lat'].values 
+    # lond = ds['lon'].values
+    # # spatial smoothing
+    # doas, latd, lond = spatial_smoothing(doas,latd,lond,0.5,0.05)
+    # # interpolate:
+    # doas = interp_site(latd,lond,doas,site_info)
 
     for dy in range(1,daysinmn[mn-1]+1):
     # for dy in range(1,2):
-        doasfname = f'/storage1/fs1/rvmartin2/Active/haihuizhu/02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_{qcstr}/Tropomi_Regrid_{yr}{mn:02d}{dy:02d}_{qcstr}.nc'
-        gchpfname = f'/storage1/fs1/rvmartin/Active/haihuizhu/4.SPARTAN_SO4/05.GCHP_outputs/4.ceds_2021/GCHP_SO2_SO4_PM25_ceds_{yr}_{mn:02d}{dy:02d}.nc'
-        
-        # read doas:
-        ds = xr.open_dataset(doasfname) 
-        doas = ds['so2'].values.T # check variable name
-        doas = doas/2.69e16 # convert unit
-        latd = ds['lat'].values 
-        lond = ds['lon'].values
+        # doasfname = f'/storage1/fs1/rvmartin2/Active/haihuizhu/02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_{qcstr}/Tropomi_Regrid_{yr}{mn:02d}{dy:02d}_{qcstr}.nc'
+        # # read doas:
+        # ds = xr.open_dataset(doasfname) 
+        # doas = ds['so2'].values.T # check variable name
+        # doas = doas/2.69e16 # convert unit
+        # latd = ds['lat'].values 
+        # lond = ds['lon'].values
+        # # spatial smoothing
+        # doas, latd, lond = spatial_smoothing(doas,latd,lond,0.5,0.05)
+        # # interpolate:
+        # doas = interp_site(latd,lond,doas,site_info)
+
+        cobrafname = f'/storage1/fs1/rvmartin2/Active/haihuizhu/02.TROPOMI_SO2_Ref/COBRA/download/s5p-l3grd-so2-cobra-pbl-001-day-{yr}{mn:02d}{dy:02d}-20240619.nc' # use monthly mean so far
+        # read COBRA:
+        ds = xr.open_dataset(cobrafname) 
+        cobra = ds['SO2_column_number_density'].values # check variable name
+        latc = ds['latitude'].values # presumably all sources share the same lat lon
+        lonc = ds['longitude'].values
         # spatial smoothing
-        doas, latd, lond = spatial_smoothing(doas,latd,lond,0.5,0.05)
+        cobra, latc, lonc = spatial_smoothing(cobra,latc,lonc,0.4,0.05)
         # interpolate:
-        doas = interp_site(latd,lond,doas,site_info)
+        cobra = interp_site(latc,lonc,cobra,site_info)
 
-
+        # GCHP-CEDS
+        gchpfname = f'/storage1/fs1/rvmartin/Active/haihuizhu/4.SPARTAN_SO4/05.GCHP_outputs/4.ceds_2021/GCHP_SO2_SO4_PM25_ceds_{yr}_{mn:02d}{dy:02d}.nc'
         ds = xr.open_dataset(gchpfname) 
         gchp = ds['so2'].values.T # check variable name
         gchp = gchp/2.69e16 # convert unit
         latg = ds['latitude'].values 
         long = ds['longitude'].values
         # interpolate:
-        gchp = interp_site(latg,long,gchp,site_info)
+        ceds = interp_site(latg,long,gchp,site_info)
+
+        # GCHP-EDGAR
+        gchpfname = f'/storage1/fs1/rvmartin/Active/haihuizhu/4.SPARTAN_SO4/05.GCHP_outputs/5.edgar_2021/GCHP_SO2_SO4_BC_PM25_edgar_{yr}_{mn:02d}{dy:02d}.nc'
+        ds = xr.open_dataset(gchpfname) 
+        gchp = ds['so2'].values.T # check variable name
+        gchp = gchp/2.69e16 # convert unit
+        latg = ds['latitude'].values 
+        long = ds['longitude'].values
+        # interpolate:
+        edgar = interp_site(latg,long,gchp,site_info)
+        
+        # GCHP-HTAP
+        gchpfname = f'/storage1/fs1/rvmartin/Active/haihuizhu/4.SPARTAN_SO4/05.GCHP_outputs/2.htap_2018/GCHP_SO2_SO4_BC_PM25_htap_2018_{mn:02d}{dy:02d}.nc'
+        ds = xr.open_dataset(gchpfname) 
+        gchp = ds['so2'].values.T # check variable name
+        gchp = gchp/2.69e16 # convert unit
+        latg = ds['latitude'].values 
+        long = ds['longitude'].values
+        # interpolate:
+        htap = interp_site(latg,long,gchp,site_info)
 
         # populate to the compiled dictionary
-        datestr = f'{yr}-{mn:02d}-{dy:02d}'
+        datestr0 = f'2020-{mn:02d}-{dy:02d}'
+        datestr1 = f'{yr}-{mn:02d}-{dy:02d}'
+        datestr2 = f'2022-{mn:02d}-{dy:02d}'
+        datestr3 = f'2023-{mn:02d}-{dy:02d}'
+        datestr4 = f'2024-{mn:02d}-{dy:02d}'
         for sid, site in enumerate(site_info['site']):
             for i, tdate in enumerate(data1[site]['date']):
-                if tdate == datestr:
-                    data1[site]['tropomi-doas'][i] = doas[sid]
-                    data1[site]['tropomi-cobra'][i] = cobra[sid]
-                    data1[site]['gchp-ceds'][i] = gchp[sid]
-                    break
-
+                if tdate == datestr1 or tdate == datestr2 or tdate == datestr3 or tdate == datestr4 or tdate == datestr0:
+                    data1[site]['tropomi-cobra'][i] = float(cobra[sid])
+                    data1[site]['gchp-ceds'][i] = float(ceds[sid])
+                    data1[site]['gchp-edgar'][i] = float(edgar[sid])
+                    data1[site]['gchp-htap'][i] = float(htap[sid])
+                
             for i, tdate in enumerate(data2[site]['date']):
-                if tdate == datestr:
-                    data2[site]['tropomi-doas'][i] = doas[sid]
-                    data2[site]['tropomi-cobra'][i] = cobra[sid]
-                    data2[site]['gchp-ceds'][i] = gchp[sid]
-                    break
+                if tdate == datestr1 or tdate == datestr2 or tdate == datestr3 or tdate == datestr4 or tdate == datestr0:
+                    data2[site]['tropomi-cobra'][i] = float(cobra[sid])
+                    data2[site]['gchp-ceds'][i] = float(ceds[sid])
+                    data2[site]['gchp-edgar'][i] = float(edgar[sid])
+                    data2[site]['gchp-htap'][i] = float(htap[sid])
 
 # Step 5: save as a JSON file
 with open(outfname1, 'w') as json_file:
