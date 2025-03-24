@@ -68,13 +68,13 @@ for Yr = YEARS
                 so2 = ncread(sfname,'so2');
                 so4 = ncread(sfname,'so4');
                 pm25 = ncread(sfname,'pm25');
-                bc = ncread(sfname,'bc');
+                % bc = ncread(sfname,'bc');
             
             else
                 so2d = zeros(length(tLAT),length(tLON));
                 pm25d = zeros(length(tLAT),length(tLON));
                 so4d = zeros(length(tLAT),length(tLON));
-                bcd = zeros(length(tLAT),length(tLON));
+                % bcd = zeros(length(tLAT),length(tLON));
 
                 for Hr = 0:23
                     fname = sprintf('%s/GEOSChem.ACAG.%d%.2d%.2d_%.2d30z.nc4',InDir,Yr,Mn,Dy,Hr);
@@ -82,7 +82,7 @@ for Yr = YEARS
                     so2h = double(ncread(fname,'SpeciesConcVV_SO2')); % mol/mol dry air
                     pm25h = double(ncread(fname,'PM25')); % ug/m3
                     so4h = double(ncread(fname2,'SpeciesConcALT1_SO4')); % secondary species conc at 2m measurement height
-                    bch = double(ncread(fname,'SpeciesConcVV_BCPI')) + double(ncread(fname,'SpeciesConcVV_BCPO')); % mol/mol dry air
+                    % bch = double(ncread(fname,'SpeciesConcVV_BCPI')) + double(ncread(fname,'SpeciesConcVV_BCPO')); % mol/mol dry air
                     
                     % SO2:
                     % unit conversion [mol/mol dry air] to [molecule per cm2]:
@@ -103,13 +103,13 @@ for Yr = YEARS
                     so4h = so4h .* unitconv(:,:,:,1) .* SO4MW .* RH_growth_sia;
 
                     % BC:
-                    bch = bch .* unitconv(:,:,:,1) .* BCMW ; % no growth
+                    % bch = bch .* unitconv(:,:,:,1) .* BCMW ; % no growth
 
                     % Regrid to lat-lon
                     so2h = cube2latlon2d(so2h,lat,lon,xLAT,xLON);
                     pm25h = cube2latlon2d(pm25h(:,:,:,1),lat,lon,xLAT,xLON);
                     so4h = cube2latlon2d(so4h,lat,lon,xLAT,xLON);
-                    bch = cube2latlon2d(bch(:,:,:,1),lat,lon,xLAT,xLON);
+                    % bch = cube2latlon2d(bch(:,:,:,1),lat,lon,xLAT,xLON);
 
                     % ==== sampling at TROPOMI overpass time [Algorithm 2] ======
                     % this has the same problem as algorithm 1 but is easier to
@@ -123,32 +123,32 @@ for Yr = YEARS
                     so2d(:,LonInd,:) = so2d(:,LonInd,:) + so2h(:,LonInd,:);
                     pm25d = pm25h + pm25d;
                     so4d = so4h + so4d;
-                    bcd = bch + bcd;
+                    % bcd = bch + bcd;
                 end
 
                 % save daily data
                 so2 = so2d; clear so2d
                 pm25 = pm25d./24; clear pm25d
                 so4 = so4d./24; clear so4d
-                bc = bcd./24; clear bcd
-                savenc(sfname,so2,so4,pm25,bc,tLAT, tLON)
+                % bc = bcd./24; clear bcd
+                savenc(sfname,so2,so4,pm25,tLAT, tLON)
                 fprintf('%s saved\n',sfname)
             end
             % Calc monthly mean
             so2m = so2m + so2;
             so4m = so4m + so4;
             pm25m = pm25m + pm25;
-            bcm = bcm + bc;
+            % bcm = bcm + bc;
 
             toc
         end
         so2 = so2m ./ Dy; clear so2m
         so4 = so4m ./ Dy; clear so4m
         pm25 = pm25m ./ Dy; clear pm25m
-        bc = bcm ./ Dy; clear bcm
+        % bc = bcm ./ Dy; clear bcm
         % save monthly data
         sfname = sprintf('%s/GCHP_SO2_SO4_BC_PM25_%s_%.2d.nc',OutDir,SimName,Mn);
-        savenc(sfname,so2,so4,pm25,bc,tLAT, tLON)
+        savenc(sfname,so2,so4,pm25,tLAT, tLON)
         fprintf('%s saved\n',sfname)
 
         so2y = so2y + so2;
@@ -161,10 +161,10 @@ for Yr = YEARS
     so2 = so2y./Mn; clear so2y
     so4 = so4y./Mn; clear so4y
     pm25 = pm25y./Mn; clear pm25y
-    bc = bcy./Mn; clear bcy
+    % bc = bcy./Mn; clear bcy
     % save monthly data
     sfname = sprintf('%s/GCHP_SO2_SO4_BC_PM25_%s_annual.nc',OutDir,SimName);
-    savenc(sfname,so2,so4,pm25,bc,tLAT, tLON)
+    savenc(sfname,so2,so4,pm25,tLAT, tLON)
     fprintf('%s saved\n',sfname)
 
 end
@@ -183,7 +183,7 @@ function var = cube2latlon2d(var1,lat,lon,xLAT,xLON)
 end
 
 
-function savenc (sfname,so2,so4,pm25, bc, tLAT, tLON)
+function savenc (sfname,so2,so4,pm25,  tLAT, tLON)
 
 if exist(sfname,'file')
     delete(sfname)
@@ -194,14 +194,14 @@ nccreate(sfname, 'longitude', 'Dimensions', {'lon', length(tLON)});
 nccreate(sfname, 'so2', 'Dimensions', {'lat', length(tLAT), 'lon', length(tLON)});
 nccreate(sfname, 'so4', 'Dimensions', {'lat', length(tLAT), 'lon', length(tLON)});
 nccreate(sfname, 'pm25', 'Dimensions', {'lat', length(tLAT), 'lon', length(tLON)});
-nccreate(sfname, 'bc', 'Dimensions', {'lat', length(tLAT), 'lon', length(tLON)});
+% nccreate(sfname, 'bc', 'Dimensions', {'lat', length(tLAT), 'lon', length(tLON)});
 % write data 
 ncwrite(sfname, 'latitude', tLAT);
 ncwrite(sfname, 'longitude', tLON);
 ncwrite(sfname, 'so2', so2);
 ncwrite(sfname, 'so4', so4);
 ncwrite(sfname, 'pm25', pm25);
-ncwrite(sfname, 'bc', bc);
+% ncwrite(sfname, 'bc', bc);
 
 % adding attribute
 ncwriteatt(sfname, 'latitude', 'units', 'degrees_north');
@@ -216,8 +216,8 @@ ncwriteatt(sfname, 'so4', 'long_name', 'Surface sulfate concentration at RH 35%'
 ncwriteatt(sfname, 'pm25', 'units', 'ug/m3');  
 ncwriteatt(sfname, 'pm25', 'long_name', 'Surface PM25 concentration at RH 35%');
 
-ncwriteatt(sfname, 'bc', 'units', 'ug/m3');  
-ncwriteatt(sfname, 'bc', 'long_name', 'Surface black carbon concentration at RH 35%');
+% ncwriteatt(sfname, 'bc', 'units', 'ug/m3');  
+% ncwriteatt(sfname, 'bc', 'long_name', 'Surface black carbon concentration at RH 35%');
 
 end
 

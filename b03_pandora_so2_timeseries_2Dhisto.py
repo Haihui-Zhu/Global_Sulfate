@@ -20,62 +20,80 @@ from save_fig_util import savefig
 from interp_site_util import interp_site
 
 # user switches
-s_timeseries = 1
+s_timeseries = 0
 s_histo = 1
 
 # functions and paths
 rootdir = '/storage1/fs1/rvmartin/Active'
 indir = f'{rootdir}/Shared/haihuizhu/SO2_Pandora/'
-files =  ['24hr', 's5popt']
+# files =  ['24hr', 's5popt']
+files = ['s5popt']
 qa = 'aq01-21'
 ystr = '2020-2024'
 savedir = f'{rootdir}/Shared/haihuizhu/SO2_Pandora/figures_{ystr}/'
 mpsm2du = 6.22e23/1e4/2.69e16 # [moles per square meter] to DU
 maskfname = f'{rootdir}/haihuizhu/4.SPARTAN_SO4/ceds_scale_2021to2018/mask_fao_ceds_05.mat'
 
-def timeseries_plot(date, pandora, cobra,ceds, edgar, htap, l2qa, site, pdr_label, savedir ):
+def timeseries_plot(date, pandora, cobra, doas, ceds, edgar, htap, l2qa, site, pdr_label, savedir ):
 
 
-    fig = plt.figure(figsize=(14, 8))
+    fig, axes = plt.subplots(2, 1, figsize=(14, 16))
     # Set the global font size
-    plt.rcParams.update({'font.size': 16})  # Adjust the value to set the desired font size
+    plt.rcParams.update({'font.size': 18})  # Adjust the value to set the desired font size
 
     
-    plt.plot(date, pandora,  label=pdr_label, color='lightgrey')
+    axes[0].plot(date, pandora,  label=pdr_label, color='grey')
+    axes[1].plot(date, pandora,  label=pdr_label, color='grey')
     # for pandora, use a darker color to show quality assured data:
     pandora2 = pandora.copy()
     for i, item in enumerate(l2qa):
         if item > 5: # unassured data points
             pandora2[i] = np.nan
 
-    plt.plot(date, pandora2, color='grey') 
-    plt.plot(date, cobra, label='cobra', color='orange')
-    plt.plot(date, ceds, label='gchp-ceds', color='firebrick')
-    plt.plot(date, edgar, label='gchp-edgar', color='goldenrod')
-    plt.plot(date, htap, label='gchp-htap', color='steelblue')
+    axes[0].plot(date, pandora2, color='k', linewidth=3) 
+    axes[0].plot(date, cobra, label='cobra', color='firebrick')
+    axes[0].plot(date, doas, label='doas', color='steelblue')
+    
+    axes[1].plot(date, pandora2, color='k', linewidth=3) 
+    axes[1].plot(date, ceds, label='gchp-ceds', color='firebrick')
+    axes[1].plot(date, edgar, label='gchp-edgar', color='goldenrod')
+    axes[1].plot(date, htap, label='gchp-htap', color='steelblue')
     
     m = np.mean(pandora)
+    pstd = np.std(pandora)
+    # Calculate correlation between sources
+    # For the first subplot (axes[0])
+    axes[0].text(0.5, 0.95, f'Pandora M = {m:.3f} ({pstd:.4f})', ha='center', va='top', transform=axes[0].transAxes, color='k')
+    label_text = get_r_str(pandora, cobra)
+    axes[0].text(0.5, 0.9, label_text, ha='center', va='top', transform=axes[0].transAxes, color='firebrick')
+    label_text = get_r_str(pandora, doas)
+    axes[0].text(0.5, 0.85, label_text, ha='center', va='top', transform=axes[0].transAxes, color='steelblue')
+
+    # For the second subplot (axes[1])
+    axes[1].text(0.5, 0.95, f'Pandora M = {m:.3f} ({pstd:.4f})', ha='center', va='top', transform=axes[1].transAxes, color='k')
+    label_text = get_r_str(pandora, ceds)
+    axes[1].text(0.5, 0.9, label_text, ha='center', va='top', transform=axes[1].transAxes, color='firebrick')
+    label_text = get_r_str(pandora, edgar)
+    axes[1].text(0.5, 0.85, label_text, ha='center', va='top', transform=axes[1].transAxes, color='goldenrod')
+    label_text = get_r_str(pandora, htap)
+    axes[1].text(0.5, 0.8, label_text, ha='center', va='top', transform=axes[1].transAxes, color='steelblue')
     
-    # calcualte correlation between sources
-    plt.text(0.5, 0.95, f'Pandora M = {m:.3f}', ha='center', va='top', transform=plt.gca().transAxes, color='dimgrey')
-    label_text = get_r_str(pandora,cobra)
-    plt.text(0.5, 0.9, label_text, ha='center', va='top', transform=plt.gca().transAxes, color='orange')
-    label_text = get_r_str(pandora,ceds)
-    plt.text(0.5, 0.85, label_text, ha='center', va='top', transform=plt.gca().transAxes, color='firebrick')
-    label_text = get_r_str(pandora,edgar)
-    plt.text(0.5, 0.8, label_text, ha='center', va='top', transform=plt.gca().transAxes, color='goldenrod')
-    label_text = get_r_str(pandora,htap)
-    plt.text(0.5, 0.75, label_text, ha='center', va='top', transform=plt.gca().transAxes, color='steelblue')
+    # axes[0].set_xlabel('Date')
+    axes[0].set_ylabel(f'SO2 VCD (DU)')
+    axes[0].legend(loc='upper left')
+    axes[0].grid()
+    axes[0].xaxis.set_major_locator(mdates.MonthLocator(interval=3)) 
+    axes[0].tick_params(axis='x', rotation=45)  # Rotate for readability
     
-    plt.xlabel('Date')
-    plt.ylabel(f'SO2 VCD (DU)')
-    plt.title(site)
-    plt.legend(loc='upper left')
-    plt.grid()
-    # plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=10))  
-    plt.gca().xaxis.set_major_locator(mdates.MonthLocator(interval=3))    
-    plt.xticks(rotation=45)  # Rotate for readability
-    plt.subplots_adjust(bottom=0.15) 
+    # axes[1].set_xlabel('Date')
+    axes[1].set_ylabel(f'SO2 VCD (DU)')
+    axes[1].legend(loc='upper left')
+    axes[1].grid()
+    axes[1].xaxis.set_major_locator(mdates.MonthLocator(interval=3))  
+    axes[1].tick_params(axis='x', rotation=45)  # Rotate for readability 
+    
+    # plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=10))   
+    fig.subplots_adjust(bottom=0.15) 
 
     plt.show()
     
@@ -97,7 +115,7 @@ def subscatter(axe, x, y, datalb, ylabel,colors):
     text_2 = f"{datalb}\nPandora M = {meanx:.3f}\n{ylabel} M = {meany:.3f}"
     
     # make the scatter
-    axe.scatter(x, y,  color=colors[2])
+    axe.scatter(x, y,  s=20, color=colors[2])
     
 
     # Plot the regression line
@@ -165,9 +183,9 @@ def scatter_plots_site(x1,y1,regions,region_name,ylabel,freq_label,savedir):
         ty = y[regions==rid]
         # plt.scatter(x, y)
         if region in target_regions: # global south
-            axes[2].scatter(tx, ty,  color=colors[0] )
+            axes[2].scatter(tx, ty,  s=20,  color=colors[0] )
         else:
-            axes[2].scatter(tx, ty,  color=colors[2] )
+            axes[2].scatter(tx, ty,  s=20,  color=colors[2] )
 
     # Calculate the correlation coefficient
     correlation = np.corrcoef(x, y)[0, 1]
@@ -207,6 +225,71 @@ def scatter_plots_site(x1,y1,regions,region_name,ylabel,freq_label,savedir):
 
     plt.show()
     fname = f'{savedir}/scatter_{freq_label}_{ylabel}.png'
+    savefig(fname, fig)
+    
+    
+def scatter_plots_site2(x1,y1,regions,region_name,ylabel,freq_label,savedir):
+    valid = ~np.isnan(x1) & ~np.isnan(y1)  # ~ is the bitwise NOT operator, used here to invert the boolean array
+    x1 = np.array(x1)
+    y1 = np.array(y1)
+    x = x1[valid]
+    y = y1[valid]
+    regions = regions[valid]
+    
+    # figure style
+    colors = ['firebrick','goldenrod','steelblue','k']  
+    
+    fig,ax = plt.subplots(figsize=(5, 5))
+    # Set the global font size
+    plt.rcParams.update({'font.size': 14})  # Adjust the value to set the desired font size
+   
+    # start final plot
+    target_regions = ['Africa','America-Central and South','Asia-East','Asia-South','Asia-Southeast','Middle East','Asia Pacific'] # regions that will be shown in the plots   
+    
+    for rid, region in enumerate(region_name):
+        tx = x[regions==rid]
+        ty = y[regions==rid]
+        # plt.scatter(x, y)
+        if region in target_regions: # global south
+            ax.scatter(tx, ty,  s=20,  color=colors[0] )
+        else:
+            ax.scatter(tx, ty,  s=20,  color=colors[2] )
+
+    # Calculate the correlation coefficient
+    correlation = np.corrcoef(x, y)[0, 1]
+    correlation = correlation**2
+    meanx = np.mean(x)
+    meany = np.mean(y)
+
+    # Perform linear regression
+    slope, intercept, r_value, p_value, std_err = linregress(x, y)
+    it = '-+'
+    itv = abs(intercept)
+    text_str = f"y = {slope:.2f}x {it[int(intercept>0)]} {itv:.2f}\n$r^2$ = {correlation:.2f}\nN = {len(x)}"
+    text_2 = f"Pandora M = {meanx:.3f}\n{ylabel} M = {meany:.3f}"
+    
+
+    # Plot the regression line
+    x_values = np.linspace(-0.5,2.1, 10)
+    y_values = intercept + slope * x_values
+    ax.plot(x_values, y_values, 'r-', linewidth=1.5)  # Red line for regression
+    ax.plot(x_values, x_values, '--', color='grey', linewidth=1.5)  # 1:1
+    
+    ax.text(0.05, 0.95, text_str, ha='left', va='top', transform=plt.gca().transAxes )
+    ax.text(0.9, 0.05, text_2, ha='right', va='bottom', transform=plt.gca().transAxes )
+    
+    # Set x and y axis limits
+    ax.set_xlim(-0.4, 2)  # Set the x-axis limits
+    ax.set_ylim(-0.4, 2)  # Set the y-axis limits
+
+    # Labeling
+    ax.set_xlabel(f"Pandora $SO_2$ (DU)")
+    ax.set_ylabel(f"{ylabel} $SO_2$ (DU)")
+    plt.subplots_adjust(left=0.2,bottom=0.2) 
+    # plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+
+    plt.show()
+    fname = f'{savedir}/scatter_{freq_label}_{ylabel}_single.png'
     savefig(fname, fig)
 
 def histo2d(x1,y1,ylabel,freq_label,savedir):
@@ -266,25 +349,27 @@ def get_r_str(x,y):
     x_clean = x[valid]
     y_clean = y[valid]
     m = np.mean(y_clean)
+    tstd = np.std(y_clean)
     if len(x_clean)>5:
         r = np.corrcoef(x_clean, y_clean)[0, 1]
-        label_text = f"r = {r:.2f} M = {m:.3f}"  
+        label_text = f"r = {r:.2f} M = {m:.3f} ({tstd:.4f})"  
     else:
         label_text = None
     return label_text
 
-def add_items(y1doas,y2doas, data):
+def add_items(y1doas,y2doas,tstd, data):
     doas = np.array([np.nan if v is None else v for v in data])
     for item in doas:
         y1doas.append(item)
 
     y2doas.append(np.nanmean(doas))
+    tstd.append(np.nanstd(doas))
 
-    return y1doas, y2doas
+    return y1doas, y2doas, tstd
 
 # start processing data
 for file in files:
-    fullname = f'{indir}/compiled_pandora_so2_{ystr}_{file}_{qa}_with_cobra-d_gchp-d.json'
+    fullname = f'{indir}/compiled_pandora_so2_{ystr}_{file}_{qa}_with_trop-d_gchp-d.json'
     # load data
     with open(fullname, 'r') as json_file:
         data = json.load(json_file)
@@ -299,14 +384,23 @@ for file in files:
     # initialize histogram data
     x1 = [] # all data point
     y1cobra = []
+    y1doas = []
     y1ceds = []
     y1edgar = []
     y1htap = []
     x2 = [] # site mean
+    x2std = []
     y2cobra = []
+    y2cobrastd = []
+    y2doas = []
+    y2doasstd = []
     y2ceds = []
+    y2cedsstd = []
     y2edgar = []
+    y2edgarstd = []
     y2htap = []
+    y2htapstd = []
+    
 
     site_out = []
     lat_out = []
@@ -322,15 +416,17 @@ for file in files:
         else:
             if s_timeseries == 1:
                 timeseries_plot(data[site]['date'], pandora, \
-                                data[site]['tropomi-cobra'], data[site]['gchp-ceds'], data[site]['gchp-edgar'], data[site]['gchp-htap'],\
+                                data[site]['tropomi-cobra'],  data[site]['tropomi-doas'],\
+                                data[site]['gchp-ceds'], data[site]['gchp-edgar'], data[site]['gchp-htap'],\
                                 data[site]['L2qa'], site,label, savedir1)
                 
             # collecting data for histogram
-            x1, x2           = add_items(x1,x2, pandora)
-            y1cobra, y2cobra = add_items(y1cobra,y2cobra, data[site]['tropomi-cobra'])
-            y1ceds, y2ceds   = add_items(y1ceds, y2ceds, data[site]['gchp-ceds'])
-            y1edgar, y2edgar = add_items(y1edgar, y2edgar, data[site]['gchp-edgar'])
-            y1htap, y2htap   = add_items(y1htap, y2htap, data[site]['gchp-htap'])
+            x1, x2, x2std      = add_items(x1,x2,x2std, pandora)
+            y1cobra, y2cobra, y2cobrastd = add_items(y1cobra,y2cobra, y2cobrastd, data[site]['tropomi-cobra'])
+            y1doas, y2doas,   y2doasstd   = add_items(y1doas, y2doas,y2doasstd, data[site]['tropomi-doas'])
+            y1ceds, y2ceds,   y2cedsstd   = add_items(y1ceds, y2ceds,y2cedsstd, data[site]['gchp-ceds'])
+            y1edgar, y2edgar, y2edgarstd = add_items(y1edgar, y2edgar, y2edgarstd, data[site]['gchp-edgar'])
+            y1htap, y2htap,   y2htapstd   = add_items(y1htap, y2htap,y2htapstd, data[site]['gchp-htap'])
 
             site_out.append(site)
             lat_out.append(site_info['lat'][sid])
@@ -341,6 +437,7 @@ for file in files:
     if s_histo == 1:
         # daily 
         histo2d(x1,y1cobra,'cobra',f'{file}-daily',savedir)
+        histo2d(x1,y1doas,'doas',f'{file}-daily',savedir)
         histo2d(x1,y1ceds,'gchp-ceds',f'{file}-daily',savedir)
         histo2d(x1,y1edgar,'gchp-edgar',f'{file}-daily',savedir)
         histo2d(x1,y1htap,'gchp-htap',f'{file}-daily',savedir)
@@ -350,11 +447,21 @@ for file in files:
 
         # site mean
         scatter_plots_site(x2,y2cobra,regions,region_name,'cobra',f'{file}-site',savedir)
+        scatter_plots_site(x2,y2doas,regions,region_name,'doas',f'{file}-site',savedir)
         scatter_plots_site(x2,y2ceds,regions,region_name,'gchp-ceds',f'{file}-site',savedir)
         scatter_plots_site(x2,y2edgar,regions,region_name,'gchp-edgar',f'{file}-site',savedir)
         scatter_plots_site(x2,y2htap,regions,region_name,'gchp-htap',f'{file}-site',savedir)
+        
+        scatter_plots_site2(x2,y2cobra,regions,region_name,'cobra',f'{file}-site',savedir)
+        scatter_plots_site2(x2,y2doas,regions,region_name,'doas',f'{file}-site',savedir)
+        scatter_plots_site2(x2,y2ceds,regions,region_name,'gchp-ceds',f'{file}-site',savedir)
+        scatter_plots_site2(x2,y2edgar,regions,region_name,'gchp-edgar',f'{file}-site',savedir)
+        scatter_plots_site2(x2,y2htap,regions,region_name,'gchp-htap',f'{file}-site',savedir)
 
     # save site mean to excel
-    data = pd.DataFrame({'site': site_out,'lat':lat_out, 'lon': lon_out, 'pandora': x2, \
-                         'cobra-d': y2cobra, 'gchp-ceds': y2ceds, 'gchp-edgar': y2edgar, 'gchp-htap': y2htap})
+    data = pd.DataFrame({'site': site_out,'lat':lat_out, 'lon': lon_out, 'pandora': x2, 'pandora-std':x2std, \
+                        'cobra-d': y2cobra, 'cobra-std':y2cobrastd, 'doas-d': y2doas, 'doas-std': y2doasstd, \
+                        'gchp-ceds': y2ceds, 'ceds-std':y2cedsstd, \
+                        'gchp-edgar': y2edgar,'edgar-std':y2edgarstd, \
+                        'gchp-htap': y2htap, 'htap-std':y2htapstd})
     data.to_csv(f'{savedir}site_mean_summary_{file}.csv', index=False)  

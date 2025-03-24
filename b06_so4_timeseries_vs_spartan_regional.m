@@ -211,41 +211,21 @@ for rgn = 1:length(existrg)
         tprc25 = prc25(:,sid);
         tprc75 = prc75(:,sid);
         % to deal with missing data (part 1: using mean for missing data)
-        nanind = find(isnan(tprc25));
+        nanind =  find(isnan(tprc25));
         if ~isempty(nanind)
-            for i = 1:length(nanind)
-                if nanind(i) == 1
-                    tprc25(1) = tprc25(2);
-                    tprc75(1) = tprc75(2);
-                elseif  nanind(i) == 12
-                    tprc25(12) = tprc25(11);
-                    tprc75(12) = tprc75(11);
-                else
-                    n = 0;
-                    while nanind(i)-n >=1 && isnan(tprc25(nanind(i)-n))
-                        n = n+1;
-                    end
-                    m = 0;
-                    while nanind(i)+m <=12 && isnan(tprc25(nanind(i)+m))
-                        m = m+1;
-                    end
-                    if nanind(i)-n == 0 && nanind(i)+m < 13% no lower end
-                        tprc25(nanind(i)) = tprc25(nanind(i)+m);
-                        tprc75(nanind(i)) = tprc75(nanind(i)+m);
-                        tmean(nanind(i))  = tmean(nanind(i)+m);
-                    elseif  nanind(i)+m == 13 && nanind(i)-n > 0% no upper end
-                        tprc25(nanind(i)) = tprc25(nanind(i)-n);
-                        tprc75(nanind(i)) = tprc75(nanind(i)-n);
-                        tmean(nanind(i))  = tmean(nanind(i)-n);
-                    else
-                        tprc25(nanind(i)) = 0.5*(tprc25(nanind(i)-n) + tprc25(nanind(i)+m));
-                        tprc75(nanind(i)) = 0.5*(tprc75(nanind(i)-n) + tprc75(nanind(i)+m));
-                        tmean(nanind(i)) = 0.5*(tmean(nanind(i)-n) + tmean(nanind(i)+m));
-                    end
-                end
-            end
-        end
+            mnvalid = 1:12;
+            % valid only matrices
+            mnvalid(nanind)=[]; % index for month with valid data
+            tprc25valid = tprc25; tprc25valid(nanind)=[];
+            tprc75valid = tprc75; tprc75valid(nanind)=[];
+            meanvalid = tmean; meanvalid(nanind)=[];
 
+            % expand to 12 month
+            tmean = interp1(mnvalid,meanvalid,1:12,'nearest','extrap')';
+            tprc25 = interp1(mnvalid,tprc25valid,1:12,'nearest','extrap')';
+            tprc75 = interp1(mnvalid,tprc75valid,1:12,'nearest','extrap')';
+        end
+        
 
         % ================= Plot Begins ===========================
 

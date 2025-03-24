@@ -78,9 +78,11 @@ end
 meanmnpm = NaN.*zeros(12,length(target_sim)+1,length(latitudes)); % Mn mean PM2.5 at each site
 prc25pm  = NaN.*zeros(12,length(target_sim)+1,length(latitudes)); % 25% percentile
 prc75pm  = NaN.*zeros(12,length(target_sim)+1,length(latitudes)); % 75% percentile
+stdpm    = NaN.*zeros(length(target_sim)+1,length(latitudes));
 meanmnso2= NaN.*zeros(12,length(target_sim)+1,length(latitudes)); % Mn mean SO4 at each site
 prc25so2 = NaN.*zeros(12,length(target_sim)+1,length(latitudes)); % 25% percentile
 prc75so2 = NaN.*zeros(12,length(target_sim)+1,length(latitudes)); % 75% percentile
+stdso2   = NaN.*zeros(length(target_sim)+1,length(latitudes));
 
 for tg = 1:length(target_sim)
     % ==== load measurement + coincident sim ====
@@ -111,8 +113,18 @@ for tg = 1:length(target_sim)
     pm25_sim = squeeze( pm25_sim(rows,:) );
     so4_sim = squeeze( so4_sim(rows,:) );
 
-    for sid = 1:length(latitudes)
+    % ==== collect useful data ====
 
+    for sid = 1:length(latitudes)
+        % total std
+        Ind = find(~isnan(sptall(:,1,sid)));
+        stdpm(1,sid) = std(sptall(Ind,1,sid));
+        stdpm(tg+1,sid) = std(pm25_sim(Ind,sid));
+        Ind = find(~isnan(sptall(:,2,sid)));
+        stdso2(1,sid) = std(sptall(Ind,2,sid));
+        stdso2(tg+1,sid) = std(so4_sim(Ind,sid));
+
+        % monthly mean, 25 prct and 75 prct
         for Mn = 1:12
             Ind = find(dates_selected(:,2) == Mn); % ignore interannual differences
             tmnPM = sptall(Ind,1,sid);
@@ -150,14 +162,14 @@ end
 
 %% save data
 
-% SO2
+% SO24
 spec = 'SO4';
 sfname = sprintf('%s/gchp_vs_spartan_%s_bysite.mat', SaveDir,spec);
-save(sfname, 'meanmnso2','prc25so2', 'prc75so2', 'Site_cities','latitudes','longitudes','target_sim')
+save(sfname, 'meanmnso2','prc25so2', 'prc75so2', 'Site_cities','latitudes','longitudes','target_sim','stdso2')
 
 % PM2.5
 spec = 'PM2.5';
 sfname = sprintf('%s/gchp_vs_spartan_%s_bysite.mat', SaveDir, spec);
-save(sfname, 'meanmnpm', 'prc25pm', 'prc75pm', 'Site_cities','latitudes','longitudes','target_sim')
+save(sfname, 'meanmnpm', 'prc25pm', 'prc75pm', 'Site_cities','latitudes','longitudes','target_sim','stdpm')
 
 

@@ -135,7 +135,7 @@ for sid, site in enumerate(site_name):
     data_temp[0] = data_temp[0].apply(lambda x: convert_to_local_solar_time(x, data1[site]['lon']))
 
     # ====== [optional 1] find data within S5P overpass time (13:30) =======
-    mask =  (data_temp[0].dt.hour == 13) & (data_temp[0].dt.year >= 2020)  & (data_temp[0].dt.year <= 2022)# 
+    mask =  (data_temp[0].dt.hour == 13) & (data_temp[0].dt.year >= 2020) 
     data_temp_1 = data_temp[mask]
     
     # quality checks
@@ -163,7 +163,7 @@ for sid, site in enumerate(site_name):
 
 
     # ====== [optional 2] calculate 24 hr mean data ============================
-    mask = (data_temp[0].dt.year >= 2020) & (data_temp[0].dt.year <= 2022)
+    mask = (data_temp[0].dt.year >= 2020) 
     data_temp_2 = data_temp[mask]
     # data_temp_2 = data_temp
     

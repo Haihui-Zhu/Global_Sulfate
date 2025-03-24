@@ -25,9 +25,9 @@ indir = '/storage1/fs1/rvmartin/Active/Shared/haihuizhu/SO2_Pandora/'
 qa = 'aq01-21'
 ystr = '2020-2024'
 infname1 = f'{indir}/compiled_pandora_so2_{ystr}_s5popt_{qa}.json'
-outfname1 = f'{indir}/compiled_pandora_so2_{ystr}_s5popt_{qa}_with_cobra-d_gchp-d.json'
+outfname1 = f'{indir}/compiled_pandora_so2_{ystr}_s5popt_{qa}_with_trop-d_gchp-d.json'
 infname2 = f'{indir}/compiled_pandora_so2_{ystr}_24hr_{qa}.json'
-outfname2 = f'{indir}/compiled_pandora_so2_{ystr}_24hr_{qa}_with_cobra-d_gchp-d.json'
+outfname2 = f'{indir}/compiled_pandora_so2_{ystr}_24hr_{qa}_with_trop-d_gchp-d.json'
 
 # step 1: read pandora data
 with open(infname1, 'r') as file:
@@ -49,20 +49,20 @@ for site, coordinates in data1.items():
 # - loop through sites to find populate data
 yr = 2021
 daysinmn  = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; 
-qcstr =  'CF005-SZA40-QA75-vza40'
+qcstr =  'CF03-SZA40-QA75'
 simname = 'ceds_2021'
 
 
 for sid, site in enumerate(site_info['site']):
-    # data1[site]['tropomi-doas'] = [None]*len(data1[site]['date'])
     data1[site]['tropomi-cobra'] = [None]*len(data1[site]['date'])
+    data1[site]['tropomi-doas'] = [None]*len(data1[site]['date'])
     data1[site]['gchp-ceds'] = [None]*len(data1[site]['date'])
     data1[site]['gchp-edgar'] = [None]*len(data1[site]['date'])
     data1[site]['gchp-htap'] = [None]*len(data1[site]['date'])
 
 
-    # data2[site]['tropomi-doas'] = [None]*len(data2[site]['date'])
     data2[site]['tropomi-cobra'] = [None]*len(data2[site]['date'])
+    data2[site]['tropomi-doas'] = [None]*len(data2[site]['date'])
     data2[site]['gchp-ceds'] = [None]*len(data2[site]['date'])
     data2[site]['gchp-edgar'] = [None]*len(data2[site]['date'])
     data2[site]['gchp-htap'] = [None]*len(data2[site]['date'])
@@ -85,17 +85,17 @@ for mn in range(1,13):
 
     for dy in range(1,daysinmn[mn-1]+1):
     # for dy in range(1,2):
-        # doasfname = f'/storage1/fs1/rvmartin2/Active/haihuizhu/02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_{qcstr}/Tropomi_Regrid_{yr}{mn:02d}{dy:02d}_{qcstr}.nc'
-        # # read doas:
-        # ds = xr.open_dataset(doasfname) 
-        # doas = ds['so2'].values.T # check variable name
-        # doas = doas/2.69e16 # convert unit
-        # latd = ds['lat'].values 
-        # lond = ds['lon'].values
-        # # spatial smoothing
-        # doas, latd, lond = spatial_smoothing(doas,latd,lond,0.5,0.05)
-        # # interpolate:
-        # doas = interp_site(latd,lond,doas,site_info)
+        doasfname = f'/storage1/fs1/rvmartin2/Active/haihuizhu/02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_{qcstr}/Tropomi_Regrid_{yr}{mn:02d}{dy:02d}_{qcstr}.nc'
+        # read doas:
+        ds = xr.open_dataset(doasfname) 
+        doas = ds['so2'].values.T # check variable name
+        doas = doas/2.69e16 # convert unit
+        latd = ds['lat'].values 
+        lond = ds['lon'].values
+        # spatial smoothing
+        doas, latd, lond = spatial_smoothing(doas,latd,lond,0.5,0.05)
+        # interpolate:
+        doas = interp_site(latd,lond,doas,site_info)
 
         cobrafname = f'/storage1/fs1/rvmartin2/Active/haihuizhu/02.TROPOMI_SO2_Ref/COBRA/download/s5p-l3grd-so2-cobra-pbl-001-day-{yr}{mn:02d}{dy:02d}-20240619.nc' # use monthly mean so far
         # read COBRA:
@@ -148,6 +148,7 @@ for mn in range(1,13):
             for i, tdate in enumerate(data1[site]['date']):
                 if tdate == datestr1 or tdate == datestr2 or tdate == datestr3 or tdate == datestr4 or tdate == datestr0:
                     data1[site]['tropomi-cobra'][i] = float(cobra[sid])
+                    data1[site]['tropomi-doas'][i] = float(doas[sid])
                     data1[site]['gchp-ceds'][i] = float(ceds[sid])
                     data1[site]['gchp-edgar'][i] = float(edgar[sid])
                     data1[site]['gchp-htap'][i] = float(htap[sid])
@@ -155,6 +156,7 @@ for mn in range(1,13):
             for i, tdate in enumerate(data2[site]['date']):
                 if tdate == datestr1 or tdate == datestr2 or tdate == datestr3 or tdate == datestr4 or tdate == datestr0:
                     data2[site]['tropomi-cobra'][i] = float(cobra[sid])
+                    data2[site]['tropomi-doas'][i] = float(doas[sid])
                     data2[site]['gchp-ceds'][i] = float(ceds[sid])
                     data2[site]['gchp-edgar'][i] = float(edgar[sid])
                     data2[site]['gchp-htap'][i] = float(htap[sid])

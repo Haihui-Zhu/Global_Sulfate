@@ -141,6 +141,33 @@ def make_bar_chart(indata,n,site_name,regions,region_name,ylabel, fig_name_lb, s
     fname = f'{savedir}/bar_{fig_name_lb}_trend.png'
     savefig(fname, fig)
 
+def sum_site_info(so4_data, D1_Dates, site, site_info):
+    year1 = 2019
+    if site == 'Beijing' or site == 'Rehovot' or site == 'Abu Dhabi' or site == 'Halifax' :
+        year1 = 2012
+        
+    # find the start and end date (cut at 2020 and 2023)
+    idx = (D1_Dates[:, 0] > year1) & (D1_Dates[:, 0] < 2024)
+    D1_Dates = D1_Dates[idx,:]
+    so4_data = so4_data[idx]
+    
+    non_nan_indices = np.where(~np.isnan(so4_data))[0]
+    first_date = D1_Dates[non_nan_indices[0]] if non_nan_indices.size > 0 else None
+    last_date = D1_Dates[non_nan_indices[-1]] if non_nan_indices.size > 0 else None
+    
+    # calculate statistics
+    non_nan_values = so4_data.dropna()
+    
+    for sid,tsite in enumerate(site_info['site']):
+        if tsite is site:
+            if first_date is not None:
+                site_info['Start Date'][sid] = f'{first_date[0]}-{first_date[1]}-{first_date[2]}'
+                site_info['End Date'][sid] = f'{last_date[0]}-{last_date[1]}-{last_date[2]}'
+                site_info['N'][sid] = f'{len(non_nan_values):.0f}'
+                site_info['Mean'][sid] = f'{np.nanmean(non_nan_values):.2f}'
+                site_info['Median'][sid] = f'{np.nanmedian(non_nan_values):.2f}'
+                site_info['std'][sid] = f'{np.nanstd(non_nan_values):.3f}'
+    return site_info
 
 
 # Read data
@@ -149,7 +176,7 @@ outdir =  '/storage1/fs1/rvmartin/Active/haihuizhu/4.SPARTAN_SO4/06.spartan_gchp
 data_version = 'pm25_so4_202410'
 simyear = 2021;
 simname = 'ceds';
-single_timeseries = True;
+single_timeseries = False;
 
 fname = f'{indir}/SPT_{data_version}.mat'
 # 'TOT','Site_cities','D3_SiteCode','latitudes','longitudes','Species','DatesNum','D1_Dates')
@@ -169,6 +196,12 @@ site_info = {
 'site': Site_cities,
 'latitudes': latitudes,
 'longitudes':longitudes,
+'Start Date': [None] * len(D3_SiteCode),
+'End Date': [None] * len(D3_SiteCode),
+'N': [None] * len(D3_SiteCode),
+'Mean': [None] * len(D3_SiteCode),
+'Median':[None] * len(D3_SiteCode),
+'std': [None] * len(D3_SiteCode),
 }
 
 date_str = []
@@ -199,6 +232,8 @@ for sid, site in enumerate(site_info['site']):
     so4slope.append( slope )
     so4days.append(days)
     
+    site_info = sum_site_info(so4_data, D1_Dates, site, site_info)
+    
     pm_data = pm25[[site]]
     slope, days = make_plot(pm_data,site,'PM2.5',outdir,single_timeseries)
     pm25slope.append( slope )
@@ -208,6 +243,11 @@ for sid, site in enumerate(site_info['site']):
     slope, days = make_plot(so4frac_data,site,'SO4_frac',outdir,single_timeseries)
     so4fracslope.append( slope )
     so4fracdays.append(days)
+
+# save site info as a csv
+filename = f'{indir}/site_info.csv'
+df = pd.DataFrame(site_info)
+df.to_csv(filename, index=False)
 
 # assign regions 
 data_mask = loadmat('ceds_scale_2021to2018/mask_fao_ceds_01_emis.mat')
