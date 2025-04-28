@@ -347,18 +347,6 @@ hold on
 
 end
 
- = 1;
-    cm(cm<0) = 0;
-    colormap(gca,flipud(cm));
-end
-set(gca,'clim',rng); %  colorscale = log or linear
-
-cb2=colorbar('vertical','fontsize',fz,'fontweight', 'bold','Position',cbvserpos(ps,:));
-cblb = sprintf('%s SO_2 [unitless]','\Delta');
-set(get(cb2,'YLabel'),'string',cblb,'fontsize',fz,'fontweight','bold','FontName','Helvetica');
-hold on
-
-end
 
 
 
