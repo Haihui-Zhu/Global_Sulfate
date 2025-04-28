@@ -19,15 +19,13 @@ def interp_site(latd,lond,doas,site_info):
     return doas_intp
 
 
-
-
-indir = '/storage1/fs1/rvmartin/Active/Shared/haihuizhu/SO2_Pandora/'
+indir = '/pierce-scratch/haihui/Global_Sulfate/'
 qa = 'aq01-21'
 ystr = '2020-2024'
-infname1 = f'{indir}/compiled_pandora_so2_{ystr}_s5popt_{qa}.json'
-outfname1 = f'{indir}/compiled_pandora_so2_{ystr}_s5popt_{qa}_with_trop-d_gchp-d.json'
-infname2 = f'{indir}/compiled_pandora_so2_{ystr}_24hr_{qa}.json'
-outfname2 = f'{indir}/compiled_pandora_so2_{ystr}_24hr_{qa}_with_trop-d_gchp-d.json'
+infname1 = f'{indir}/SO2_Pandora/compiled/compiled_pandora_so2_{ystr}_s5popt_{qa}.json'
+outfname1 = f'{indir}/SO2_Pandora/compiled/compiled_pandora_so2_{ystr}_s5popt_{qa}_with_omipca_d.json'
+infname2 = f'{indir}/SO2_Pandora/compiled/compiled_pandora_so2_{ystr}_24hr_{qa}.json'
+outfname2 = f'{indir}/SO2_Pandora/compiled/compiled_pandora_so2_{ystr}_24hr_{qa}_with_omipca_d.json'
 
 # step 1: read pandora data
 with open(infname1, 'r') as file:
@@ -49,23 +47,22 @@ for site, coordinates in data1.items():
 # - loop through sites to find populate data
 yr = 2021
 daysinmn  = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; 
-qcstr =  'CF03-SZA40-QA75'
-simname = 'ceds_2021'
+qcstr =  'CF03-SZA75-QA0'
 
 
 for sid, site in enumerate(site_info['site']):
-    data1[site]['tropomi-cobra'] = [None]*len(data1[site]['date'])
-    data1[site]['tropomi-doas'] = [None]*len(data1[site]['date'])
-    data1[site]['gchp-ceds'] = [None]*len(data1[site]['date'])
-    data1[site]['gchp-edgar'] = [None]*len(data1[site]['date'])
-    data1[site]['gchp-htap'] = [None]*len(data1[site]['date'])
+    data1[site]['omi-pca'] = [None]*len(data1[site]['date'])
+    # data1[site]['tropomi-doas'] = [None]*len(data1[site]['date'])
+    # data1[site]['gchp-ceds'] = [None]*len(data1[site]['date'])
+    # data1[site]['gchp-edgar'] = [None]*len(data1[site]['date'])
+    # data1[site]['gchp-htap'] = [None]*len(data1[site]['date'])
 
 
-    data2[site]['tropomi-cobra'] = [None]*len(data2[site]['date'])
-    data2[site]['tropomi-doas'] = [None]*len(data2[site]['date'])
-    data2[site]['gchp-ceds'] = [None]*len(data2[site]['date'])
-    data2[site]['gchp-edgar'] = [None]*len(data2[site]['date'])
-    data2[site]['gchp-htap'] = [None]*len(data2[site]['date'])
+    data2[site]['omi-pca'] = [None]*len(data2[site]['date'])
+    # data2[site]['tropomi-doas'] = [None]*len(data2[site]['date'])
+    # data2[site]['gchp-ceds'] = [None]*len(data2[site]['date'])
+    # data2[site]['gchp-edgar'] = [None]*len(data2[site]['date'])
+    # data2[site]['gchp-htap'] = [None]*len(data2[site]['date'])
 
 
 for mn in range(1,13):
@@ -85,81 +82,33 @@ for mn in range(1,13):
 
     for dy in range(1,daysinmn[mn-1]+1):
     # for dy in range(1,2):
-        doasfname = f'/storage1/fs1/rvmartin2/Active/haihuizhu/02.TROPOMI_SO2_Ref/NASA_SO2_Tesellation_{qcstr}/Tropomi_Regrid_{yr}{mn:02d}{dy:02d}_{qcstr}.nc'
-        # read doas:
-        ds = xr.open_dataset(doasfname) 
-        doas = ds['so2'].values.T # check variable name
-        doas = doas/2.69e16 # convert unit
-        latd = ds['lat'].values 
-        lond = ds['lon'].values
+
+        omipcafname = f'{indir}/02.TROPOMI_SO2_Ref/OMI_SO2_Tesellation_CF03-SZA75-QA0/Regrid_omi_so2_{yr}{mn:02d}{dy:02d}_{qcstr}.nc' # use monthly mean so far
+        # read omipca:
+        ds = xr.open_dataset(omipcafname) 
+        omipca = ds['SO2'].values # check variable name
+        latc = ds['lat'].values # presumably all sources share the same lat lon
+        lonc = ds['lon'].values
         # spatial smoothing
-        doas, latd, lond = spatial_smoothing(doas,latd,lond,0.5,0.05)
+        omipca, latc, lonc = spatial_smoothing(omipca,latc,lonc,0.5,0.1)
         # interpolate:
-        doas = interp_site(latd,lond,doas,site_info)
+        omipca = interp_site(latc,lonc,omipca,site_info)
 
-        cobrafname = f'/storage1/fs1/rvmartin2/Active/haihuizhu/02.TROPOMI_SO2_Ref/COBRA/download/s5p-l3grd-so2-cobra-pbl-001-day-{yr}{mn:02d}{dy:02d}-20240619.nc' # use monthly mean so far
-        # read COBRA:
-        ds = xr.open_dataset(cobrafname) 
-        cobra = ds['SO2_column_number_density'].values # check variable name
-        latc = ds['latitude'].values # presumably all sources share the same lat lon
-        lonc = ds['longitude'].values
-        # spatial smoothing
-        cobra, latc, lonc = spatial_smoothing(cobra,latc,lonc,0.4,0.05)
-        # interpolate:
-        cobra = interp_site(latc,lonc,cobra,site_info)
-
-        # GCHP-CEDS
-        gchpfname = f'/storage1/fs1/rvmartin/Active/haihuizhu/4.SPARTAN_SO4/05.GCHP_outputs/4.ceds_2021/GCHP_SO2_SO4_PM25_ceds_{yr}_{mn:02d}{dy:02d}.nc'
-        ds = xr.open_dataset(gchpfname) 
-        gchp = ds['so2'].values.T # check variable name
-        gchp = gchp/2.69e16 # convert unit
-        latg = ds['latitude'].values 
-        long = ds['longitude'].values
-        # interpolate:
-        ceds = interp_site(latg,long,gchp,site_info)
-
-        # GCHP-EDGAR
-        gchpfname = f'/storage1/fs1/rvmartin/Active/haihuizhu/4.SPARTAN_SO4/05.GCHP_outputs/5.edgar_2021/GCHP_SO2_SO4_BC_PM25_edgar_{yr}_{mn:02d}{dy:02d}.nc'
-        ds = xr.open_dataset(gchpfname) 
-        gchp = ds['so2'].values.T # check variable name
-        gchp = gchp/2.69e16 # convert unit
-        latg = ds['latitude'].values 
-        long = ds['longitude'].values
-        # interpolate:
-        edgar = interp_site(latg,long,gchp,site_info)
-        
-        # GCHP-HTAP
-        gchpfname = f'/storage1/fs1/rvmartin/Active/haihuizhu/4.SPARTAN_SO4/05.GCHP_outputs/2.htap_2018/GCHP_SO2_SO4_BC_PM25_htap_2018_{mn:02d}{dy:02d}.nc'
-        ds = xr.open_dataset(gchpfname) 
-        gchp = ds['so2'].values.T # check variable name
-        gchp = gchp/2.69e16 # convert unit
-        latg = ds['latitude'].values 
-        long = ds['longitude'].values
-        # interpolate:
-        htap = interp_site(latg,long,gchp,site_info)
 
         # populate to the compiled dictionary
         datestr0 = f'2020-{mn:02d}-{dy:02d}'
-        datestr1 = f'{yr}-{mn:02d}-{dy:02d}'
+        datestr1 = f'2021-{mn:02d}-{dy:02d}'
         datestr2 = f'2022-{mn:02d}-{dy:02d}'
         datestr3 = f'2023-{mn:02d}-{dy:02d}'
         datestr4 = f'2024-{mn:02d}-{dy:02d}'
         for sid, site in enumerate(site_info['site']):
             for i, tdate in enumerate(data1[site]['date']):
                 if tdate == datestr1 or tdate == datestr2 or tdate == datestr3 or tdate == datestr4 or tdate == datestr0:
-                    data1[site]['tropomi-cobra'][i] = float(cobra[sid])
-                    data1[site]['tropomi-doas'][i] = float(doas[sid])
-                    data1[site]['gchp-ceds'][i] = float(ceds[sid])
-                    data1[site]['gchp-edgar'][i] = float(edgar[sid])
-                    data1[site]['gchp-htap'][i] = float(htap[sid])
+                    data1[site]['omi-pca'][i] = float(omipca[sid])
                 
             for i, tdate in enumerate(data2[site]['date']):
                 if tdate == datestr1 or tdate == datestr2 or tdate == datestr3 or tdate == datestr4 or tdate == datestr0:
-                    data2[site]['tropomi-cobra'][i] = float(cobra[sid])
-                    data2[site]['tropomi-doas'][i] = float(doas[sid])
-                    data2[site]['gchp-ceds'][i] = float(ceds[sid])
-                    data2[site]['gchp-edgar'][i] = float(edgar[sid])
-                    data2[site]['gchp-htap'][i] = float(htap[sid])
+                    data2[site]['omi-pca'][i] = float(omipca[sid])
 
 # Step 5: save as a JSON file
 with open(outfname1, 'w') as json_file:

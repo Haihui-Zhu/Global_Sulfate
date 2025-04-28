@@ -132,10 +132,9 @@ def read_spt(fname, varname):
     return site_info, data, target_sim 
 
 # functions and paths
-rootdir = '/storage1/fs1/rvmartin/Active'
-savedir1 = f'{rootdir}/Shared/haihuizhu/SO2_Pandora/figures_2020-2024/'
-savedir2 = f'{rootdir}/haihuizhu/4.SPARTAN_SO4/06.spartan_gchp/'
-fname = f'{rootdir}/Shared/haihuizhu/SO2_Pandora//figures_2020-2022/site_mean_summary_24hr.csv'
+rootdir = '/pierce-scratch/haihui/Global_Sulfate/'
+savedir1 = f'{rootdir}/figures/'
+fname = f'{rootdir}/figures/site_mean_summary_24hr.csv'
 
 # load mask file
 data_mask = loadmat('ceds_scale_2021to2018/mask_fao_ceds_05.mat')
@@ -206,7 +205,7 @@ mapdata = mapdata/2.69e16 # convert unit
 latc = ds['lat'].values  
 lonc = ds['lon'].values
 mapdata, latc, lonc = spatial_smoothing(mapdata,latc,lonc,0.5,0.05) 
-mapdata = np.where(mask>0, mapdata, np.nan)
+# mapdata = np.where(mask>0, mapdata, np.nan)
 # make the map
 sfname = f'{savedir1}/pandora_doas_{qcstr}_mask'
 iname = 'Pandora'
@@ -237,7 +236,7 @@ for region in extents:
 #     print(f'GCHP-CEDS {region}:')
 #     pwm(mapdata, latg, long, target_lat=extents[region]['lat'], target_lon=extents[region]['lon'])
 
-
+"""
 ### SI Figure - GCHP-EDGAR vs Pandora
 # read site mean SO2 VCD 
 outer = df['gchp-ceds-daily']
@@ -277,7 +276,7 @@ concentric_map(inner, outer, lats,lons, mapdata, latg, long, iname, oname, site,
 for region in extents:
     print(f'GCHP-CEDS {region}:')
     pwm(mapdata, latg, long, target_lat=extents[region]['lat'], target_lon=extents[region]['lon'])
-
+"""
 
 """
 ### Figure 3 - GCHP vs SPARTAN

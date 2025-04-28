@@ -1,5 +1,6 @@
 
 import xarray as xr
+import numpy as np
 
 def spatial_smoothing(mapdata,lat,lon,resout,resin):
 
@@ -8,7 +9,7 @@ def spatial_smoothing(mapdata,lat,lon,resout,resin):
     shape2 = len(lon)
 
     so2_1_r = mapdata.reshape(int(shape1/scale),scale,int(shape2/scale),scale)
-    so2_1_r = so2_1_r.mean(axis=(1, 3))
+    so2_1_r = np.nanmean(so2_1_r, axis=(1, 3))
 
     lat_r = lat.reshape(int(shape1/scale),scale)
     lat_r = lat_r.mean(axis=1)

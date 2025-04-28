@@ -20,8 +20,8 @@ from save_fig_util import savefig
 from interp_site_util import interp_site
 
 # user switches
-s_timeseries = 0
-s_histo = 1
+s_timeseries = 1
+s_histo = 0
 
 # functions and paths
 rootdir = '/storage1/fs1/rvmartin/Active'
@@ -369,7 +369,7 @@ def add_items(y1doas,y2doas,tstd, data):
 
 # start processing data
 for file in files:
-    fullname = f'{indir}/compiled_pandora_so2_{ystr}_{file}_{qa}_with_trop-d_gchp-d.json'
+    fullname = f'{indir}/compiled_pandora_so2_{ystr}_{file}_{qa}_with_omipca-d.json'
     # load data
     with open(fullname, 'r') as json_file:
         data = json.load(json_file)

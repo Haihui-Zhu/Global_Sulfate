@@ -23,3 +23,12 @@ CEDS-*
 GCHP_13.4.0_Aerosol
 HTAPv3
 functions/Download_*.sh
+COBRA
+emission
+gchp_14.4.0
+pandora-so2
+sat-so2 
+spartan
+figures
+*.slurm
+
